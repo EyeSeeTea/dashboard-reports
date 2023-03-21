@@ -1,7 +1,7 @@
 import { FeedbackOptions } from "@eyeseetea/feedback-component";
 
 export const appConfig: AppConfig = {
-    appKey: "dhis2-app-skeleton",
+    appKey: "dashboard-reports",
     appearance: {
         showShareButton: true,
     },

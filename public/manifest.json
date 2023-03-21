@@ -1,6 +1,6 @@
 {
-    "short_name": "DHIS2 Skeleton App",
-    "name": "DHIS2 Skeleton App",
+    "short_name": "Dashboard Report",
+    "name": "Dashboard Report for MSF",
     "icons": [
         {
             "src": "favicon.ico",

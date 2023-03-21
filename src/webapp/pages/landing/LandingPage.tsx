@@ -1,39 +1,55 @@
-import { Typography } from "@material-ui/core";
-import React from "react";
-import { useHistory } from "react-router-dom";
-import { Card, CardGrid } from "../../components/card-grid/CardGrid";
+import React, { useEffect } from "react";
 import { useAppContext } from "../../contexts/app-context";
+import { Dashboard } from "../../../domain/entities/Dashboard";
+import { DashboardFilter } from "../../components/dashboard-filter/DashboardFilter";
+import { DashboardSettings } from "../../components/dashboard-settings/DashboardSettings";
 
 export const LandingPage: React.FC = React.memo(() => {
-    const history = useHistory();
-    const { currentUser } = useAppContext();
+    const { compositionRoot } = useAppContext();
+    const [dialogState, setDialogState] = React.useState(false);
+    const [dashboards, setDashboards] = React.useState<Dashboard[]>([]);
+    const [dashboard, setDashboard] = React.useState<string>("");
 
-    const cards: Card[] = [
-        {
-            title: "Section",
-            key: "main",
-            children: [
-                {
-                    name: "John",
-                    description: "Entry point 1",
-                    listAction: () => history.push("/for/John"),
-                },
-                {
-                    name: "Mary",
-                    description: "Entry point 2",
-                    listAction: () => history.push("/for/Mary"),
-                },
-            ],
-        },
-    ];
+    useEffect(() => {
+        async function fetchData() {
+            const dashboards = await compositionRoot.dashboards.get.execute();
+            setDashboards(dashboards);
+            if (dashboards[0]) {
+                setDashboard(dashboards[0].id);
+            }
+        }
+
+        fetchData();
+    }, [compositionRoot]);
+
+    const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+        setDashboard(event.target.value as string);
+    };
+
+    const onSettings: React.MouseEventHandler<HTMLButtonElement> = () => {
+        setDialogState(true);
+    };
+
+    const onDialogClose = () => {
+        setDialogState(false);
+    };
+
+    const onSubmitForm: React.FormEventHandler<HTMLFormElement> = e => {
+        e.preventDefault();
+        setDialogState(false);
+    };
 
     return (
         <>
-            <CardGrid cards={cards} />
-            <Typography variant="h6">
-                {" "}
-                Current user: {currentUser.name} [{currentUser.id}]
-            </Typography>
+            <DashboardFilter
+                dashboards={dashboards}
+                dashboard={dashboard}
+                handleChange={handleChange}
+                onSettings={onSettings}
+            />
+            <DashboardSettings onSubmitForm={onSubmitForm} onDialogClose={onDialogClose} dialogState={dialogState} />
         </>
     );
 });
+
+LandingPage.displayName = "LandingPage";

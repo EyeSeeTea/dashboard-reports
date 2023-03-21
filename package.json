@@ -1,13 +1,13 @@
 {
-    "name": "dhis2-app-skeleton",
-    "description": "DHIS2 Skeleton App",
+    "name": "dashboard-reports",
+    "description": "Dashboard Report for MSF",
     "version": "0.0.1",
     "license": "GPL-3.0",
     "author": "EyeSeeTea team",
     "homepage": ".",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/eyeseetea/dhis2-app-skeleton.git"
+        "url": "git+https://github.com/eyeseetea/dashboard-reports.git"
     },
     "dependencies": {
         "@dhis2/app-runtime": "2.8.0",
@@ -97,7 +97,7 @@
         "prettify": "prettier \"./**/*.{js,jsx,json,css,ts,tsx}\" --write",
         "extract-pot": "yarn d2-i18n-extract -p src/ -o i18n/",
         "localize": "yarn update-po && d2-i18n-generate -n dhis2-skeleton-app -p ./i18n/ -o ./src/locales/",
-        "update-po": "yarn extract-pot && find i18n/ -name '*.po' -exec msgmerge --backup=off -U {} i18n/en.pot \\;",
+        "update-po": "yarn extract-pot && i18n/es.po -exec msgmerge --backup=off -U {} i18n/en.pot \\;",
         "manifest": "d2-manifest package.json build/manifest.webapp",
         "cy:verify": "cypress verify",
         "cy:e2e:open": "NODE_ENV=test CYPRESS_E2E=true cypress open",
@@ -106,8 +106,8 @@
         "script-example": "npx ts-node src/scripts/example.ts"
     },
     "manifest.webapp": {
-        "name": "DHIS2 Skeleton App",
-        "description": "DHIS2 Skeleton App",
+        "name": "Dashboard Report for MSF",
+        "description": "Dashboard Report for MSF",
         "icons": {
             "48": "icon.png"
         },

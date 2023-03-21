@@ -49,7 +49,7 @@ export const App: React.FC<AppProps> = React.memo(function App({ api, d2, instan
         <MuiThemeProvider theme={muiTheme}>
             <OldMuiThemeProvider muiTheme={muiThemeLegacy}>
                 <SnackbarProvider>
-                    <HeaderBar appName="Skeleton App" />
+                    <HeaderBar appName="Dashboard Report" />
 
                     {appConfig.feedback && appContext && (
                         <Feedback options={appConfig.feedback} username={appContext.currentUser.username} />

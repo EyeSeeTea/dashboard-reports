@@ -2,46 +2,76 @@ import React from "react";
 import styled from "styled-components";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
-import IconButton from "@material-ui/core/IconButton";
-import SettingsIcon from "@material-ui/icons/Settings";
 import TextField from "@material-ui/core/TextField";
+import InputLabel from "@material-ui/core/InputLabel";
+import FormControl from "@material-ui/core/FormControl";
 import { Dashboard } from "../../../domain/entities/Dashboard";
+import i18n from "../../../locales";
+
+export type DashboardFilterData = {
+    dashboard: Dashboard;
+    month: string;
+};
 
 export const DashboardFilter: React.FC<DashboardFilterProps> = React.memo(
-    ({ dashboard, dashboards, handleChange, onSettings }) => {
+    ({ children, dashboard, dashboards, onChange }) => {
+        const onChangeSelect = (event: React.ChangeEvent<{ value: unknown }>) => {
+            const value = event.target.value as string;
+            const dashboard = dashboards.find(d => d.id === value);
+            if (dashboard) {
+                const dashboardData: DashboardFilterData = {
+                    dashboard,
+                    // I'm going to change this in a next commit
+                    // since I don't really know the format I need right now
+                    month: "",
+                };
+                onChange(dashboardData);
+            }
+        };
+
+        const onFocus = () => {
+            const $domEl = window.document.querySelector("input#month-filter") as HTMLInputElement;
+            $domEl.showPicker();
+        };
+
+        const inputLabelProps = React.useMemo(() => {
+            return { shrink: true };
+        }, []);
+
         return (
             <Container>
-                <Select
-                    label="select a dashboard"
-                    id="dashboards-select"
-                    name="dashboards-select"
-                    value={dashboard}
-                    onChange={handleChange}
-                >
-                    {dashboards.map((item: any) => {
-                        return (
-                            <MenuItem key={item.id} value={item.id}>
-                                {item.name}
-                            </MenuItem>
-                        );
-                    })}
-                </Select>
+                <FormControlContainer>
+                    <InputLabel id="select-dashboard-label">{i18n.t("Select Dashboard")}</InputLabel>
+
+                    <Select
+                        labelId="select-dashboard-label"
+                        id="dashboards-select"
+                        name="dashboards-select"
+                        value={dashboard}
+                        onChange={onChangeSelect}
+                    >
+                        {dashboards.map(dashboard => {
+                            return (
+                                <MenuItem key={dashboard.id} value={dashboard.id}>
+                                    {dashboard.name}
+                                </MenuItem>
+                            );
+                        })}
+                    </Select>
+                </FormControlContainer>
+
                 <DateContainer>
                     <TextField
                         id="month-filter"
                         name="month-filter"
-                        label="Select Month"
+                        label={i18n.t("Select Month")}
                         type="month"
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
+                        InputLabelProps={inputLabelProps}
+                        onFocus={onFocus}
                     />
                 </DateContainer>
-                <IconContainer>
-                    <IconButton onClick={onSettings}>
-                        <SettingsIcon />
-                    </IconButton>
-                </IconContainer>
+
+                {children}
             </Container>
         );
     }
@@ -53,19 +83,19 @@ const Container = styled.div`
     margin-top: 30px;
 `;
 
-const IconContainer = styled.div`
-    margin-left: auto;
-`;
-
 const DateContainer = styled.div`
     margin-left: 10px;
 `;
 
+const FormControlContainer = styled(FormControl)`
+    min-width: 150px;
+`;
+
 export interface DashboardFilterProps {
+    children?: React.ReactNode;
     dashboards: Dashboard[];
     dashboard: string;
-    handleChange: (event: React.ChangeEvent<{ value: unknown }>) => void;
-    onSettings: React.MouseEventHandler<HTMLButtonElement>;
+    onChange: (dashboard: DashboardFilterData) => void;
 }
 
 DashboardFilter.displayName = "DashboardFilter";

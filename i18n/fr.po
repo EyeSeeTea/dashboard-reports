@@ -9,19 +9,19 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 msgid "Add"
-msgstr "Añadir"
+msgstr ""
 
 msgid "List"
-msgstr "Listar"
+msgstr ""
 
 msgid "Back"
-msgstr "Volver"
+msgstr ""
 
 msgid "Help"
-msgstr "Ayuda"
+msgstr ""
 
 msgid "Hello {{name}}"
-msgstr "Hola {{name}}"
+msgstr ""
 
 msgid "Detail page"
 msgstr ""

@@ -6,11 +6,12 @@ import TextField from "@material-ui/core/TextField";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import { Dashboard } from "../../../domain/entities/Dashboard";
+import { DateMonth } from "../../../domain/entities/DateMonth";
 import i18n from "../../../locales";
 
 export type DashboardFilterData = {
     dashboard: Dashboard;
-    month: string;
+    dateMonth: DateMonth;
 };
 
 export const DashboardFilter: React.FC<DashboardFilterProps> = React.memo(
@@ -23,7 +24,10 @@ export const DashboardFilter: React.FC<DashboardFilterProps> = React.memo(
                     dashboard,
                     // I'm going to change this in a next commit
                     // since I don't really know the format I need right now
-                    month: "",
+                    dateMonth: {
+                        month: 3,
+                        year: 2023,
+                    },
                 };
                 onChange(dashboardData);
             }

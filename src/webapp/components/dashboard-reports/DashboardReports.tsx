@@ -2,15 +2,15 @@ import React, { useEffect } from "react";
 import styled from "styled-components";
 import IconButton from "@material-ui/core/IconButton";
 import SettingsIcon from "@material-ui/icons/Settings";
-import Snackbar from "@material-ui/core/Snackbar";
 import { useAppContext } from "../../contexts/app-context";
 import { Dashboard } from "../../../domain/entities/Dashboard";
 import { DashboardFilter, DashboardFilterData } from "../../components/dashboard-filter/DashboardFilter";
 import { DashboardSettings } from "../../components/dashboard-settings/DashboardSettings";
+import { useSnackbar } from "@eyeseetea/d2-ui-components";
 
 export const DashboardReports: React.FC = React.memo(() => {
+    const snackbar = useSnackbar();
     const { compositionRoot } = useAppContext();
-    const [errorMessage, setErrorMessage] = React.useState("");
     const [dialogState, setDialogState] = React.useState(false);
     const [dashboards, setDashboards] = React.useState<Dashboard[]>([]);
     const [dashboard, setDashboard] = React.useState<string>("");
@@ -22,13 +22,13 @@ export const DashboardReports: React.FC = React.memo(() => {
                     setDashboards(dashboards);
                 },
                 err => {
-                    setErrorMessage(err);
+                    snackbar.openSnackbar("error", err);
                 }
             );
         }
 
         fetchData();
-    }, [compositionRoot]);
+    }, [compositionRoot, snackbar]);
 
     const onChange = (dashboardFilter: DashboardFilterData) => {
         setDashboard(dashboardFilter.dashboard.id);
@@ -46,16 +46,8 @@ export const DashboardReports: React.FC = React.memo(() => {
         setDialogState(false);
     };
 
-    const showAlert = errorMessage.length > 0;
-
-    const onCloseSnackBar = () => {
-        setErrorMessage("");
-    };
-
     return (
         <>
-            <Snackbar open={showAlert} autoHideDuration={6000} message={errorMessage} onClose={onCloseSnackBar} />
-
             <DashboardFilter dashboards={dashboards} dashboard={dashboard} onChange={onChange}>
                 <IconContainer>
                     <IconButton onClick={onSettings}>

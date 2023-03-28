@@ -5,23 +5,35 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2021-08-25T12:21:36.218Z\n"
-"PO-Revision-Date: 2021-08-25T12:21:36.218Z\n"
+"POT-Creation-Date: 2023-03-28T01:11:25.072Z\n"
+"PO-Revision-Date: 2023-03-28T01:11:25.072Z\n"
 
-msgid "Add"
+msgid "Select Dashboard"
 msgstr ""
 
-msgid "List"
+msgid "Select Month"
+msgstr ""
+
+msgid "Last four months"
+msgstr ""
+
+msgid "Select Report"
+msgstr ""
+
+msgid "App Settings"
+msgstr ""
+
+msgid "Font Size"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Close"
 msgstr ""
 
 msgid "Back"
 msgstr ""
 
 msgid "Help"
-msgstr ""
-
-msgid "Hello {{name}}"
-msgstr ""
-
-msgid "Detail page"
 msgstr ""

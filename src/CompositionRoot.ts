@@ -6,6 +6,7 @@ import { GetCurrentUserUseCase } from "./domain/usecases/GetCurrentUserUseCase";
 import { GetInstanceVersionUseCase } from "./domain/usecases/GetInstanceVersionUseCase";
 import { D2Api } from "./types/d2-api";
 import { GetDashboardsUseCase } from "./domain/usecases/GetDashboardsUseCase";
+import { GetVisualizationsUseCase } from "./domain/usecases/GetVisualizationsUseCase";
 
 export function getCompositionRoot(api: D2Api, instance: Instance) {
     const instanceRepository = new InstanceDefaultRepository(instance);
@@ -21,6 +22,7 @@ export function getCompositionRoot(api: D2Api, instance: Instance) {
         },
         dashboards: {
             get: new GetDashboardsUseCase(dashboardRepository),
+            getVisualizations: new GetVisualizationsUseCase(dashboardRepository),
         },
     };
 }

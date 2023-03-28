@@ -1,4 +1,3 @@
 export type DateMonth = {
-    month: number;
-    year: number;
+    period?: string;
 };

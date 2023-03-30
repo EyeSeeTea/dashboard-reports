@@ -1,3 +1,4 @@
 export type DateMonth = {
-    period?: string;
+    period: string;
+    lastMonths: boolean;
 };

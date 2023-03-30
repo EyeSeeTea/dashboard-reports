@@ -13,24 +13,13 @@ import i18n from "../../../locales";
 
 export type DashboardFilterData = {
     dashboard?: Dashboard;
-    dateMonth?: DateMonth;
+    dateMonth: DateMonth;
 };
 
 export const DashboardFilter: React.FC<DashboardFilterProps> = React.memo(({ children, dashboards, onChange }) => {
     const [dashboard, setDashboard] = React.useState<string>("");
-    const [month, setMonth] = React.useState<string>();
+    const [month, setMonth] = React.useState<string>("");
     const [lastMonths, setLastMonths] = React.useState<boolean>(false);
-
-    // React.useEffect(() => {
-    //     const dashboardSelected = dashboards.find(d => d.id === dashboard);
-    //     const dashboardData: DashboardFilterData = {
-    //         dashboard: dashboardSelected,
-    //         dateMonth: {
-    //             period: lastMonths ? "LAST_4_MONTHS" : month,
-    //         },
-    //     };
-    //     onChange(dashboardData);
-    // }, [lastMonths, month, dashboard, dashboards, onChange]);
 
     const onChangeSelect = (event: React.ChangeEvent<{ value: unknown }>) => {
         const value = event.target.value as string;
@@ -39,7 +28,8 @@ export const DashboardFilter: React.FC<DashboardFilterProps> = React.memo(({ chi
         const dashboardData: DashboardFilterData = {
             dashboard: dashboardSelected,
             dateMonth: {
-                period: lastMonths ? "LAST_4_MONTHS" : month,
+                period: month,
+                lastMonths,
             },
         };
         onChange(dashboardData);
@@ -55,7 +45,8 @@ export const DashboardFilter: React.FC<DashboardFilterProps> = React.memo(({ chi
         const dashboardData: DashboardFilterData = {
             dashboard: dashboardSelected,
             dateMonth: {
-                period: lastMonths ? "LAST_4_MONTHS" : value,
+                period: value,
+                lastMonths,
             },
         };
         setMonth(event.target.value);
@@ -68,7 +59,8 @@ export const DashboardFilter: React.FC<DashboardFilterProps> = React.memo(({ chi
         const dashboardData: DashboardFilterData = {
             dashboard: dashboardSelected,
             dateMonth: {
-                period: value ? "LAST_4_MONTHS" : month,
+                period: month,
+                lastMonths: value,
             },
         };
         setLastMonths(value);
@@ -142,7 +134,6 @@ const FormControlContainer = styled(FormControl)`
 export interface DashboardFilterProps {
     children?: React.ReactNode;
     dashboards: Dashboard[];
-    // dashboard: string;
     onChange: (dashboard: DashboardFilterData) => void;
 }
 

@@ -7,11 +7,16 @@ import { GetInstanceVersionUseCase } from "./domain/usecases/GetInstanceVersionU
 import { D2Api } from "./types/d2-api";
 import { GetDashboardsUseCase } from "./domain/usecases/GetDashboardsUseCase";
 import { GetVisualizationsUseCase } from "./domain/usecases/GetVisualizationsUseCase";
+import { GetMapsUseCase } from "./domain/usecases/GetMapsUsesCase";
+import { SaveSettingsUseCase } from "./domain/usecases/SaveSettingsUseCase";
+import { GetSettingsUseCase } from "./domain/usecases/GetSettingsUseCase";
+import { SettingsD2Repository } from "./data/repositories/SettingsD2Repository";
 
 export function getCompositionRoot(api: D2Api, instance: Instance) {
     const instanceRepository = new InstanceDefaultRepository(instance);
     const usersRepository = new UserD2Repository(api);
     const dashboardRepository = new DashboardD2Repository(api);
+    const settingsRepository = new SettingsD2Repository(api);
 
     return {
         instance: {
@@ -23,6 +28,11 @@ export function getCompositionRoot(api: D2Api, instance: Instance) {
         dashboards: {
             get: new GetDashboardsUseCase(dashboardRepository),
             getVisualizations: new GetVisualizationsUseCase(dashboardRepository),
+            getMaps: new GetMapsUseCase(dashboardRepository),
+        },
+        settings: {
+            get: new GetSettingsUseCase(settingsRepository),
+            save: new SaveSettingsUseCase(settingsRepository),
         },
     };
 }

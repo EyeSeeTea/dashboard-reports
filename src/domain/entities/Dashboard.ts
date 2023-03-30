@@ -1,28 +1,51 @@
-export type reportType = "reportTablePlugin" | "chartPlugin" | "mapPlugin" | "eventChartPlugin" | "eventReportPlugin";
+import { Id, Ref } from "./Ref";
 
-// const obj = {
-//     eventReport: { id: 1 },
-//     eventChart: { id: 2 },
-//     map: { id: 3 },
-//     visualization: {
-//         id: 4,
-//         type: "PIVOT_TABLE", // anything else belongs to chartPlugin
-//     },
-//     pluginName: "",
-// };
+export type ReportType = "reportTablePlugin" | "chartPlugin" | "mapPlugin" | "eventChartPlugin" | "eventReportPlugin";
+
+export interface ItemRef {
+    dimension: "pe";
+    items: Ref[];
+    filters: Ref[];
+    columns: Ref[];
+}
+
+export interface ReportItem {
+    id: Id;
+    el: DOMSelectorId;
+    columns?: ItemRef[];
+    rows?: ItemRef[];
+    filters?: ItemRef[];
+    reportType: ReportType;
+    mapViews?: D2MapView[];
+}
+
+export type D2MapView = {
+    columns: ItemRef[];
+    rows: ItemRef[];
+    filters: ItemRef[];
+};
+
+export interface ItemRef {
+    id: "pe";
+    dimension: "pe";
+    items: Ref[];
+}
+
+type DOMSelectorId = string;
 
 export interface DashboardData {
-    id: string;
+    id: Id;
     name: string;
     dashboardItems: DashboardItem[];
 }
 
 export interface DashboardItem {
-    id: string;
+    id: Id;
     type: string;
     reportId: string;
-    reportType: reportType;
-    reportTitle?: string;
+    reportType: ReportType;
+    reportTitle: string;
+    elementId: string;
     map: Map;
     visualization: Visualization;
     eventReport: EventReport;
@@ -30,31 +53,28 @@ export interface DashboardItem {
 }
 
 export interface Visualization {
-    id: string;
+    id: Id;
     name: string;
     type: string;
-    rows: any;
-    columns: any;
-    filters: any;
 }
 
 export interface Map {
-    id: string;
+    id: Id;
     name: string;
 }
 
 export interface EventReport {
-    id: string;
+    id: Id;
     name: string;
 }
 
 export interface EventChart {
-    id: string;
+    id: Id;
     name: string;
 }
 
 export class Dashboard {
-    public readonly id: string;
+    public readonly id: Id;
     public readonly name: string;
     public readonly dashboardItems: DashboardItem[];
 
@@ -63,9 +83,15 @@ export class Dashboard {
         this.name = data.name;
         this.dashboardItems = data.dashboardItems
             .filter(dashboardItem => {
-                return dashboardItem.visualization || dashboardItem.map;
+                return (
+                    dashboardItem.visualization ||
+                    dashboardItem.map ||
+                    dashboardItem.eventChart ||
+                    dashboardItem.eventReport
+                );
             })
             .map(dashboardItem => {
+                dashboardItem.elementId = dashboardItem.id;
                 const isVisualization = dashboardItem.type === "VISUALIZATION";
                 if (isVisualization) {
                     const isPivot = dashboardItem.visualization.type === "PIVOT_TABLE";

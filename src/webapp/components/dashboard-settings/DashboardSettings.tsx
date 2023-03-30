@@ -9,15 +9,18 @@ import { Settings } from "../../../domain/entities/Settings";
 import i18n from "../../../locales";
 
 export const DashboardSettings: React.FC<DashboardSettingsProps> = React.memo(
-    ({ dialogState, onSubmitForm, onDialogClose }) => {
-        const [fontSize, setFontSize] = React.useState("");
+    ({ dialogState, onSubmitForm, onDialogClose, settings }) => {
+        const [fontSize, setFontSize] = React.useState(() => {
+            return settings.fontSize;
+        });
 
         const onSubmit: React.FormEventHandler<HTMLFormElement> = e => {
             e.preventDefault();
-            const settings: Settings = {
+            const settingsToSave: Settings = {
+                id: settings.id,
                 fontSize,
             };
-            onSubmitForm(settings);
+            onSubmitForm(settingsToSave);
         };
 
         const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,6 +59,7 @@ export const DashboardSettings: React.FC<DashboardSettingsProps> = React.memo(
 );
 
 export interface DashboardSettingsProps {
+    settings: Settings;
     dialogState: boolean;
     onDialogClose: () => void;
     onSubmitForm: (settings: Settings) => void;

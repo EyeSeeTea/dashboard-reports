@@ -70,31 +70,13 @@ export const DashboardReports: React.FC = React.memo(() => {
     const filterIsEmpty = !dashboard?.dashboard;
 
     React.useEffect(() => {
-        const url = isDev ? "https://play.dhis2.org/2.37.9" : api.baseUrl;
-
-        const username = "admin";
-        const password = "district";
+        const url = isDev ? "/dhis2" : api.baseUrl;
 
         window.reportTablePlugin.url = url;
         window.chartPlugin.url = url;
         window.mapPlugin.url = url;
         window.eventChartPlugin.url = url;
         window.eventReportPlugin.url = url;
-
-        window.eventChartPlugin.username = username;
-        window.eventChartPlugin.password = password;
-
-        window.eventReportPlugin.username = username;
-        window.eventReportPlugin.password = password;
-
-        window.reportTablePlugin.username = username;
-        window.reportTablePlugin.password = password;
-
-        window.chartPlugin.username = username;
-        window.chartPlugin.password = password;
-
-        window.mapPlugin.username = username;
-        window.mapPlugin.password = password;
 
         function fetchDashboardsAndSettings() {
             compositionRoot.settings.get.execute().run(

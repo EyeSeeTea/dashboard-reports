@@ -11,7 +11,7 @@ export interface ItemRef {
 
 export interface ReportItem {
     id: Id;
-    el: DOMSelectorId;
+    el: string;
     columns?: ItemRef[];
     rows?: ItemRef[];
     filters?: ItemRef[];
@@ -30,8 +30,6 @@ export interface ItemRef {
     dimension: "pe";
     items: Ref[];
 }
-
-type DOMSelectorId = string;
 
 export interface DashboardData {
     id: Id;

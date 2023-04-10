@@ -6,17 +6,20 @@ import { GetCurrentUserUseCase } from "./domain/usecases/GetCurrentUserUseCase";
 import { GetInstanceVersionUseCase } from "./domain/usecases/GetInstanceVersionUseCase";
 import { D2Api } from "./types/d2-api";
 import { GetDashboardsUseCase } from "./domain/usecases/GetDashboardsUseCase";
-import { GetVisualizationsUseCase } from "./domain/usecases/GetVisualizationsUseCase";
-import { GetMapsUseCase } from "./domain/usecases/GetMapsUsesCase";
+import { GetReportsUseCase } from "./domain/usecases/GetReportsUseCase";
 import { SaveSettingsUseCase } from "./domain/usecases/SaveSettingsUseCase";
 import { GetSettingsUseCase } from "./domain/usecases/GetSettingsUseCase";
 import { SettingsD2Repository } from "./data/repositories/SettingsD2Repository";
+import { SaveRawReportUseCase } from "./domain/usecases/SaveRawReportUseCase";
+import { DashboardExportDocxRepository } from "./data/repositories/DashboardExportDocxRepository";
+import { SaveComplexReportUseCase } from "./domain/usecases/SaveComplexReportUseCase";
 
 export function getCompositionRoot(api: D2Api, instance: Instance) {
     const instanceRepository = new InstanceDefaultRepository(instance);
     const usersRepository = new UserD2Repository(api);
     const dashboardRepository = new DashboardD2Repository(api);
     const settingsRepository = new SettingsD2Repository(api);
+    const exportDocxRepository = new DashboardExportDocxRepository();
 
     return {
         instance: {
@@ -27,12 +30,15 @@ export function getCompositionRoot(api: D2Api, instance: Instance) {
         },
         dashboards: {
             get: new GetDashboardsUseCase(dashboardRepository),
-            getVisualizations: new GetVisualizationsUseCase(dashboardRepository),
-            getMaps: new GetMapsUseCase(dashboardRepository),
+            getReports: new GetReportsUseCase(dashboardRepository),
         },
         settings: {
             get: new GetSettingsUseCase(settingsRepository),
             save: new SaveSettingsUseCase(settingsRepository),
+        },
+        exportRepository: {
+            saveRawReport: new SaveRawReportUseCase(exportDocxRepository),
+            saveComplexReport: new SaveComplexReportUseCase(exportDocxRepository),
         },
     };
 }

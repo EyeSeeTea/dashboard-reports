@@ -1,5 +1,4 @@
 import React from "react";
-import * as docx from "docx";
 import html2canvas from "html2canvas";
 import { saveAs } from "file-saver";
 import styled from "styled-components";
@@ -10,13 +9,16 @@ import IconButton from "@material-ui/core/IconButton";
 import Button from "@material-ui/core/Button";
 import SettingsIcon from "@material-ui/icons/Settings";
 import Typography from "@material-ui/core/Typography";
-import { useAppContext } from "../../contexts/app-context";
-import { Dashboard, DashboardItem, ReportItem } from "../../../domain/entities/Dashboard";
+import { useSnackbar, useLoading } from "@eyeseetea/d2-ui-components";
+import { DashboardItem, ReportItem } from "../../../domain/entities/Dashboard";
 import { DashboardFilter, DashboardFilterData } from "../../components/dashboard-filter/DashboardFilter";
 import { DashboardSettings } from "../../components/dashboard-settings/DashboardSettings";
-import { useSnackbar, useLoading } from "@eyeseetea/d2-ui-components";
 import i18n from "../../../locales";
 import { Settings } from "../../../domain/entities/Settings";
+import { useDashboard } from "../../hooks/UseDashboard";
+import { useSettings } from "../../hooks/UseSettings";
+import { useReports } from "../../hooks/useReports";
+import { useAppContext } from "../../contexts/app-context";
 
 function convertSvgToPng(input: HTMLElement): Promise<HTMLCanvasElement> {
     const promise = new Promise<HTMLCanvasElement>((resolve, reject) => {
@@ -58,78 +60,17 @@ function getCanvasInformation(dashboardItem: DocxItem, canvas: HTMLCanvasElement
 }
 
 export const DashboardReports: React.FC = React.memo(() => {
+    const { compositionRoot } = useAppContext();
     const snackbar = useSnackbar();
     const loading = useLoading();
-    const { compositionRoot, isDev, api } = useAppContext();
+    const { dashboards } = useDashboard();
+    const { settings, saveSettings } = useSettings();
     const [dialogState, setDialogState] = React.useState(false);
-    const [dashboards, setDashboards] = React.useState<Dashboard[]>([]);
     const [dashboard, setDashboard] = React.useState<DashboardFilterData>();
     const [report, setReport] = React.useState<string>("");
-    const [settings, setSettings] = React.useState<Settings>();
+    useReports({ dashboard });
 
     const filterIsEmpty = !dashboard?.dashboard;
-
-    React.useEffect(() => {
-        const url = isDev ? "/dhis2" : api.baseUrl;
-
-        window.reportTablePlugin.url = url;
-        window.chartPlugin.url = url;
-        window.mapPlugin.url = url;
-        window.eventChartPlugin.url = url;
-        window.eventReportPlugin.url = url;
-
-        function fetchDashboardsAndSettings() {
-            compositionRoot.settings.get.execute().run(
-                settings => {
-                    setSettings(settings);
-                },
-                err => {
-                    snackbar.openSnackbar("error", err);
-                }
-            );
-
-            compositionRoot.dashboards.get.execute().run(
-                dashboards => {
-                    setDashboards(dashboards);
-                },
-                err => {
-                    snackbar.openSnackbar("error", err);
-                }
-            );
-        }
-
-        fetchDashboardsAndSettings();
-    }, [compositionRoot, snackbar, api, isDev]);
-
-    React.useEffect(() => {
-        if (filterIsEmpty) return;
-
-        if (dashboard.dashboard?.dashboardItems) {
-            loading.show();
-            compositionRoot.dashboards.getMaps.execute(dashboard.dashboard?.dashboardItems, dashboard.dateMonth).run(
-                mapsData => {
-                    window.mapPlugin.load(mapsData);
-                },
-                err => {
-                    snackbar.openSnackbar("error", err);
-                }
-            );
-            compositionRoot.dashboards.getVisualizations
-                .execute(dashboard.dashboard?.dashboardItems, dashboard.dateMonth)
-                .run(
-                    visualizationsData => {
-                        visualizationsData.forEach(visualization => {
-                            window[visualization.reportType]?.load([visualization]);
-                        });
-                        loading.hide();
-                    },
-                    err => {
-                        snackbar.openSnackbar("error", err);
-                        loading.hide();
-                    }
-                );
-        }
-    }, [dashboard, filterIsEmpty, snackbar, compositionRoot, loading]);
 
     const onChange = (dashboardFilter: DashboardFilterData) => {
         setDashboard(dashboardFilter);
@@ -144,17 +85,7 @@ export const DashboardReports: React.FC = React.memo(() => {
     };
 
     const onSubmitSettings = (settings: Settings) => {
-        loading.show();
-        compositionRoot.settings.save.execute(settings).run(
-            newSettings => {
-                setSettings(newSettings);
-                loading.hide();
-            },
-            err => {
-                snackbar.openSnackbar("error", err);
-                loading.hide();
-            }
-        );
+        saveSettings(settings);
         setDialogState(false);
     };
 
@@ -213,56 +144,17 @@ export const DashboardReports: React.FC = React.memo(() => {
     }
 
     const generateRawReport = () => {
-        if (dashboard?.dashboard && settings) {
+        if (dashboard?.dashboard?.name && settings) {
+            const dashboardTitle = dashboard?.dashboard?.name;
             const imagesPromises = getImagesFromDom(dashboard.dashboard.dashboardItems);
-            const maxWidth = 600;
 
             Promise.all(imagesPromises)
-                .then(canvasEls => {
-                    const images = canvasEls.map(canvas => {
-                        const imageWidth = canvas.width;
-                        const imageHeight = canvas.height;
-                        return new docx.Paragraph({
-                            children: [
-                                new docx.TextRun({
-                                    size: `${Number(settings.fontSize)}pt`,
-                                    break: 4,
-                                    text: canvas.title,
-                                }),
-                                new docx.ImageRun({
-                                    data: canvas.base64,
-                                    transformation: {
-                                        width: imageWidth > maxWidth ? maxWidth : imageWidth,
-                                        height: imageHeight,
-                                    },
-                                }),
-                            ],
-                        });
-                    });
-
-                    const doc = new docx.Document({
-                        sections: [
-                            {
-                                children: [
-                                    new docx.Paragraph({
-                                        alignment: docx.AlignmentType.CENTER,
-                                        children: [
-                                            new docx.TextRun({
-                                                size: `${Number(settings.fontSize)}pt`,
-                                                text: dashboard.dashboard?.name,
-                                            }),
-                                            ...images,
-                                        ],
-                                    }),
-                                ],
-                            },
-                        ],
-                    });
-
-                    docx.Packer.toBlob(doc).then(blob => {
-                        saveAs(blob, "raw.docx");
-                    });
-                }, console.error)
+                .then(docxItems => {
+                    return compositionRoot.exportRepository.saveRawReport.execute(docxItems, dashboardTitle, settings);
+                })
+                .then(blob => {
+                    saveAs(blob, "raw.docx");
+                })
                 .finally(() => {
                     loading.hide();
                 });
@@ -271,148 +163,14 @@ export const DashboardReports: React.FC = React.memo(() => {
 
     const generateComplexReport = () => {
         if (dashboard?.dashboard && settings) {
-            const maxWidth = 200;
-            const maxHeight = 200;
-            const FONT_NAME = "Arial";
             const imagesPromises = getImagesFromDom(dashboard.dashboard.dashboardItems);
 
             Promise.all(imagesPromises)
-                .then(canvasEls => {
-                    const tableRowHeader = new docx.TableRow({
-                        tableHeader: true,
-                        children: [
-                            new docx.TableCell({
-                                children: [
-                                    new docx.Paragraph({
-                                        children: [
-                                            new docx.TextRun({
-                                                size: `${Number(settings.fontSize)}pt`,
-                                                font: FONT_NAME,
-                                                text: "MO",
-                                            }),
-                                        ],
-                                    }),
-                                ],
-                            }),
-                            new docx.TableCell({
-                                children: [
-                                    new docx.Paragraph({
-                                        children: [
-                                            new docx.TextRun({
-                                                size: `${Number(settings.fontSize)}pt`,
-                                                font: FONT_NAME,
-                                                text: "IND",
-                                            }),
-                                        ],
-                                    }),
-                                ],
-                            }),
-                            new docx.TableCell({
-                                children: [
-                                    new docx.Paragraph({
-                                        children: [
-                                            new docx.TextRun({
-                                                size: `${Number(settings.fontSize)}pt`,
-                                                font: FONT_NAME,
-                                                text: "In Line?",
-                                            }),
-                                        ],
-                                    }),
-                                ],
-                            }),
-                            new docx.TableCell({
-                                children: [
-                                    new docx.Paragraph({
-                                        children: [
-                                            new docx.TextRun({
-                                                size: `${Number(settings.fontSize)}pt`,
-                                                font: FONT_NAME,
-                                                text: "Comments",
-                                            }),
-                                        ],
-                                    }),
-                                ],
-                            }),
-                        ],
-                    });
-
-                    const tableRows = canvasEls.map(canvas => {
-                        const tableRowVisualization = new docx.TableRow({
-                            children: [
-                                new docx.TableCell({
-                                    textDirection: docx.TextDirection.TOP_TO_BOTTOM_RIGHT_TO_LEFT,
-                                    children: [
-                                        new docx.Paragraph({
-                                            alignment: docx.AlignmentType.CENTER,
-                                            children: [
-                                                new docx.TextRun({
-                                                    size: `${Number(settings.fontSize)}pt`,
-                                                    font: FONT_NAME,
-                                                    text: canvas.title,
-                                                }),
-                                            ],
-                                        }),
-                                    ],
-                                }),
-                                new docx.TableCell({
-                                    children: [
-                                        new docx.Paragraph({
-                                            children: [
-                                                new docx.ImageRun({
-                                                    data: canvas.base64,
-                                                    transformation: {
-                                                        width: canvas.width > maxWidth ? maxWidth : canvas.width,
-                                                        height: canvas.height > maxHeight ? maxHeight : canvas.height,
-                                                    },
-                                                }),
-                                            ],
-                                        }),
-                                    ],
-                                }),
-                                new docx.TableCell({
-                                    children: [
-                                        new docx.Paragraph({
-                                            children: [
-                                                new docx.TextRun({
-                                                    size: `${Number(settings.fontSize)}pt`,
-                                                    text: " ",
-                                                }),
-                                            ],
-                                        }),
-                                    ],
-                                }),
-                                new docx.TableCell({
-                                    children: [
-                                        new docx.Paragraph({
-                                            children: [
-                                                new docx.TextRun({
-                                                    size: `${Number(settings.fontSize)}pt`,
-                                                    text: " ",
-                                                }),
-                                            ],
-                                        }),
-                                    ],
-                                }),
-                            ],
-                        });
-                        return tableRowVisualization;
-                    });
-
-                    const table = new docx.Table({
-                        rows: [tableRowHeader, ...tableRows],
-                    });
-
-                    const doc = new docx.Document({
-                        sections: [
-                            {
-                                children: [table],
-                            },
-                        ],
-                    });
-
-                    docx.Packer.toBlob(doc).then(blob => {
-                        saveAs(blob, "complex.docx");
-                    });
+                .then(docxItems => {
+                    return compositionRoot.exportRepository.saveComplexReport.execute(docxItems, settings);
+                })
+                .then(blob => {
+                    saveAs(blob, "complex.docx");
                 })
                 .finally(() => {
                     loading.hide();

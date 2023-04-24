@@ -11,9 +11,6 @@ export function useDashboard() {
     React.useEffect(() => {
         const url = isDev ? "/dhis2" : api.baseUrl;
 
-        window.mapPlugin.username = "admin";
-        window.mapPlugin.password = "district";
-
         window.reportTablePlugin.url = url;
         window.chartPlugin.url = url;
         window.mapPlugin.url = url;

@@ -1,7 +1,7 @@
-import { DocxItem } from "../DocxItem";
+import { DashboardImage } from "../DashboardImage";
 import { Settings } from "../entities/Settings";
 
 export interface DashboardExportRepository {
-    saveRawReport(docxItems: DocxItem[], title: string, settings: Settings): Promise<Blob>;
-    saveComplexReport(docsItems: DocxItem[], settings: Settings): Promise<Blob>;
+    saveRawReport(dashboardImages: DashboardImage[], title: string, settings: Settings): Promise<Blob>;
+    saveComplexReport(dashboardImages: DashboardImage[], settings: Settings): Promise<Blob>;
 }

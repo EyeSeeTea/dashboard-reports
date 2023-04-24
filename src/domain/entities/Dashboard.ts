@@ -16,10 +16,10 @@ export interface ReportItem {
     rows?: ItemRef[];
     filters?: ItemRef[];
     reportType: ReportType;
-    mapViews?: D2MapView[];
+    mapViews?: MapView[];
 }
 
-export type D2MapView = {
+export type MapView = {
     columns: ItemRef[];
     rows: ItemRef[];
     filters: ItemRef[];
@@ -89,32 +89,45 @@ export class Dashboard {
                 );
             })
             .map(dashboardItem => {
-                dashboardItem.elementId = dashboardItem.id;
-                const isVisualization = dashboardItem.type === "VISUALIZATION";
-                if (isVisualization) {
-                    const isPivot = dashboardItem.visualization.type === "PIVOT_TABLE";
-                    dashboardItem.reportTitle = dashboardItem.visualization.name;
-                    if (isPivot) {
-                        dashboardItem.reportType = "reportTablePlugin";
-                        dashboardItem.reportId = dashboardItem.visualization.id;
-                    } else {
-                        dashboardItem.reportType = "chartPlugin";
-                        dashboardItem.reportId = dashboardItem.visualization.id;
-                    }
-                } else if (dashboardItem.map) {
-                    dashboardItem.reportType = "mapPlugin";
-                    dashboardItem.reportId = dashboardItem.map.id;
-                    dashboardItem.reportTitle = dashboardItem.map.name;
-                } else if (dashboardItem.eventChart) {
-                    dashboardItem.reportType = "eventChartPlugin";
-                    dashboardItem.reportId = dashboardItem.eventChart.id;
-                    dashboardItem.reportTitle = dashboardItem.eventChart.name;
-                } else if (dashboardItem.eventReport) {
-                    dashboardItem.reportType = "eventReportPlugin";
-                    dashboardItem.reportId = dashboardItem.eventReport.id;
-                    dashboardItem.reportTitle = dashboardItem.eventReport.name;
-                }
-                return dashboardItem;
+                return {
+                    ...this.getReportInformation(dashboardItem),
+                    elementId: dashboardItem.id,
+                };
             });
+    }
+
+    private getReportInformation(dashboardItem: DashboardItem): DashboardItem {
+        if (dashboardItem.map) {
+            return {
+                ...dashboardItem,
+                reportType: "mapPlugin",
+                reportTitle: dashboardItem.map.name,
+                reportId: dashboardItem.map.id,
+            };
+        } else if (dashboardItem.eventChart) {
+            return {
+                ...dashboardItem,
+                reportType: "eventChartPlugin",
+                reportTitle: dashboardItem.eventChart.name,
+                reportId: dashboardItem.eventChart.id,
+            };
+        } else if (dashboardItem.eventReport) {
+            return {
+                ...dashboardItem,
+                reportType: "eventReportPlugin",
+                reportTitle: dashboardItem.eventReport.name,
+                reportId: dashboardItem.eventReport.id,
+            };
+        } else {
+            const isVisualization = dashboardItem.type === "VISUALIZATION";
+            const isPivot = dashboardItem.visualization.type === "PIVOT_TABLE";
+            const reportType = isVisualization && isPivot ? "reportTablePlugin" : "chartPlugin";
+            return {
+                ...dashboardItem,
+                reportType,
+                reportTitle: dashboardItem.visualization.name,
+                reportId: dashboardItem.visualization.id,
+            };
+        }
     }
 }

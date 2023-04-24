@@ -11,13 +11,16 @@ export type PeriodItem = {
 
 export type ReportPeriod = { type: "dateMonth"; value: DateMonth } | { type: "lastMonths"; value: boolean };
 
+function getRangeValue(reportPeriod: ReportPeriod) {
+    return reportPeriod.type === "lastMonths"
+        ? 4
+        : reportPeriod.type === "dateMonth" && reportPeriod.value.month && reportPeriod.value.year
+        ? 1
+        : 0;
+}
+
 export function generatePeriods(reportPeriod: ReportPeriod): PeriodItem[] {
-    let rangeValue = 0;
-    if (reportPeriod.type === "lastMonths") {
-        rangeValue = 4;
-    } else if (reportPeriod.type === "dateMonth" && reportPeriod.value.month && reportPeriod.value.year) {
-        rangeValue = 1;
-    }
+    const rangeValue = getRangeValue(reportPeriod);
 
     const dates = _(0)
         .range(rangeValue)

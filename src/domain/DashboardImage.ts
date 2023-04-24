@@ -1,6 +1,5 @@
-export interface DocxItem {
+export interface DashboardImage {
     title: string;
-    domEl: Element | null;
     base64: string;
     width: number;
     height: number;

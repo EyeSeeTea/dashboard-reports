@@ -19,12 +19,8 @@ export type DashboardFilterData = {
 const inputLabelProps = { shrink: true };
 
 function formatDate(value: string) {
-    if (!value) {
-        return {
-            year: 0,
-            month: 0,
-        };
-    }
+    if (!value) return { year: 0, month: 0 };
+
     const year = value.split("-")[0];
     const month = value.split("-")[1];
     return {

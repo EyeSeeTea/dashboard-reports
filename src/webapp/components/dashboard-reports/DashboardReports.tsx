@@ -15,8 +15,8 @@ import { DashboardFilter, DashboardFilterData } from "../../components/dashboard
 import { DashboardSettings } from "../../components/dashboard-settings/DashboardSettings";
 import i18n from "../../../locales";
 import { Settings } from "../../../domain/entities/Settings";
-import { useDashboard } from "../../hooks/UseDashboard";
-import { useSettings } from "../../hooks/UseSettings";
+import { useDashboard } from "../../hooks/useDashboard";
+import { useSettings } from "../../hooks/useSettings";
 import { useReports } from "../../hooks/useReports";
 import { useAppContext } from "../../contexts/app-context";
 

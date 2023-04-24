@@ -98,10 +98,10 @@ export class DashboardD2Repository implements DashboardRepository {
     }
 
     private applyPeriod(row: ItemRef, itemsPeriod: PeriodItem[]) {
-        if (row.dimension === "pe") {
-            row.items = itemsPeriod;
-        }
-        return row;
+        return {
+            ...row,
+            items: row.dimension === "pe" ? itemsPeriod : row.items,
+        };
     }
 }
 

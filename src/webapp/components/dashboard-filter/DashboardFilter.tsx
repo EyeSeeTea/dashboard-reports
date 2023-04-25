@@ -2,11 +2,11 @@ import React from "react";
 import styled from "styled-components";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
-import TextField from "@material-ui/core/TextField";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
+import { DatePicker } from "@eyeseetea/d2-ui-components";
 import { Dashboard } from "../../../domain/entities/Dashboard";
 import { ReportPeriod } from "../../../domain/entities/DateMonth";
 import i18n from "../../../locales";
@@ -15,8 +15,6 @@ export type DashboardFilterData = {
     dashboard?: Dashboard;
     dateMonth: ReportPeriod;
 };
-
-const inputLabelProps = { shrink: true };
 
 function formatDate(value: string) {
     if (!value) return { year: 0, month: 0 };
@@ -43,7 +41,7 @@ function getPeriod(lastMonths: boolean, date: string): ReportPeriod {
 
 export const DashboardFilter: React.FC<DashboardFilterProps> = React.memo(({ children, dashboards, onChange }) => {
     const [dashboard, setDashboard] = React.useState<string>("");
-    const [month, setMonth] = React.useState<string>("");
+    const [month, setMonth] = React.useState<string | null>(null);
     const [lastMonths, setLastMonths] = React.useState<boolean>(false);
 
     const onChangeSelect = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -52,20 +50,20 @@ export const DashboardFilter: React.FC<DashboardFilterProps> = React.memo(({ chi
         const dashboardSelected = dashboards.find(d => d.id === value);
         const dashboardData: DashboardFilterData = {
             dashboard: dashboardSelected,
-            dateMonth: getPeriod(lastMonths, month),
+            dateMonth: getPeriod(lastMonths, month || ""),
         };
 
         onChange(dashboardData);
     };
 
-    const onChangeMonth = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value;
+    const onChangeMonth = (moment: MomentProps) => {
+        const value = moment ? moment.format() : null;
         const dashboardSelected = dashboards.find(d => d.id === dashboard);
         const dashboardData: DashboardFilterData = {
             dashboard: dashboardSelected,
-            dateMonth: getPeriod(lastMonths, value),
+            dateMonth: getPeriod(lastMonths, value || ""),
         };
-        setMonth(event.target.value);
+        setMonth(value);
         onChange(dashboardData);
     };
 
@@ -74,7 +72,7 @@ export const DashboardFilter: React.FC<DashboardFilterProps> = React.memo(({ chi
         const dashboardSelected = dashboards.find(d => d.id === dashboard);
         const dashboardData: DashboardFilterData = {
             dashboard: dashboardSelected,
-            dateMonth: getPeriod(value, month),
+            dateMonth: getPeriod(value, month || ""),
         };
         setLastMonths(value);
         onChange(dashboardData);
@@ -103,14 +101,14 @@ export const DashboardFilter: React.FC<DashboardFilterProps> = React.memo(({ chi
             </FormControlContainer>
 
             <DateContainer>
-                <TextField
-                    id="month-filter"
-                    name="month-filter"
-                    label={i18n.t("Select Month")}
-                    type="month"
-                    InputLabelProps={inputLabelProps}
+                <DatePicker
+                    format="YYYY-MM"
                     disabled={lastMonths}
+                    value={month}
+                    views={["year", "month"]}
                     onChange={onChangeMonth}
+                    label={i18n.t("Select Month")}
+                    style={{ margin: 0, padding: 0 }}
                 />
             </DateContainer>
 
@@ -149,5 +147,9 @@ export interface DashboardFilterProps {
     dashboards: Dashboard[];
     onChange: (dashboard: DashboardFilterData) => void;
 }
+
+type MomentProps = {
+    format: () => string;
+};
 
 DashboardFilter.displayName = "DashboardFilter";

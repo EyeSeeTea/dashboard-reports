@@ -20,8 +20,8 @@ export class DashboardExportDocxRepository implements DashboardExportRepository 
                     this.createImage({
                         base64: docItem.base64,
                         height: imageHeight,
-                        maxHeight: maxWidth,
-                        maxWidth: imageHeight,
+                        maxHeight: imageHeight,
+                        maxWidth: maxWidth,
                         width: imageWidth,
                     }),
                 ],
@@ -51,8 +51,8 @@ export class DashboardExportDocxRepository implements DashboardExportRepository 
     }
 
     saveComplexReport(docsItems: DashboardImage[], settings: Settings): Promise<Blob> {
-        const maxWidth = 200;
-        const maxHeight = 200;
+        const maxWidth = 400;
+        const maxHeight = 400;
 
         const tableRowHeader = new docx.TableRow({
             tableHeader: true,
@@ -90,6 +90,10 @@ export class DashboardExportDocxRepository implements DashboardExportRepository 
                         text: canvas.title,
                     }),
                     new docx.TableCell({
+                        width: {
+                            size: maxWidth,
+                            type: docx.WidthType.DXA,
+                        },
                         children: [
                             new docx.Paragraph({
                                 children: [
@@ -104,7 +108,13 @@ export class DashboardExportDocxRepository implements DashboardExportRepository 
                             }),
                         ],
                     }),
-                    this.createEmptyTableCell({ fontSize: settings.fontSize }),
+                    this.createEmptyTableCell({
+                        fontSize: settings.fontSize,
+                        widthProps: {
+                            size: 5,
+                            type: docx.WidthType.PERCENTAGE,
+                        },
+                    }),
                     this.createEmptyTableCell({ fontSize: settings.fontSize }),
                 ],
             });
@@ -112,6 +122,10 @@ export class DashboardExportDocxRepository implements DashboardExportRepository 
         });
 
         const table = new docx.Table({
+            width: {
+                size: 100,
+                type: docx.WidthType.PERCENTAGE,
+            },
             rows: [tableRowHeader, ...tableRows],
         });
 
@@ -134,11 +148,13 @@ export class DashboardExportDocxRepository implements DashboardExportRepository 
         return new docx.Paragraph(options);
     }
 
-    private createTableCell({ fontSize, fontName, text, textDirection }: TableCell) {
+    private createTableCell({ fontSize, fontName, text, textDirection, widthProps }: TableCell) {
         return new docx.TableCell({
             textDirection,
+            width: widthProps,
             children: [
                 this.createParagraph({
+                    alignment: docx.AlignmentType.CENTER,
                     children: [
                         this.createText({
                             size: `${Number(fontSize)}pt`,
@@ -151,11 +167,12 @@ export class DashboardExportDocxRepository implements DashboardExportRepository 
         });
     }
 
-    private createEmptyTableCell({ fontSize }: Pick<TableCell, "fontSize">) {
+    private createEmptyTableCell({ fontSize, widthProps }: Pick<TableCell, "fontSize" | "widthProps">) {
         return this.createTableCell({
             fontSize: fontSize,
             fontName: FONT_NAME,
             text: " ",
+            widthProps,
         });
     }
 
@@ -183,4 +200,5 @@ type TableCell = {
     fontName: string;
     text: string;
     textDirection?: docx.TextDirection;
+    widthProps?: docx.ITableWidthProperties;
 };

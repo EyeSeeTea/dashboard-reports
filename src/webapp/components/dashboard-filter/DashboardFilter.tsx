@@ -31,11 +31,17 @@ function getPeriod(lastMonths: boolean, date: string): ReportPeriod {
     return lastMonths
         ? {
               type: "lastMonths",
-              value: lastMonths,
+              value: {
+                  lastFourMonths: lastMonths,
+                  ...formatDate(date),
+              },
           }
         : {
               type: "dateMonth",
-              value: formatDate(date),
+              value: {
+                  ...formatDate(date),
+                  lastFourMonths: lastMonths,
+              },
           };
 }
 
@@ -103,7 +109,6 @@ export const DashboardFilter: React.FC<DashboardFilterProps> = React.memo(({ chi
             <DateContainer>
                 <DatePicker
                     format="YYYY-MM"
-                    disabled={lastMonths}
                     value={month}
                     views={["year", "month"]}
                     onChange={onChangeMonth}

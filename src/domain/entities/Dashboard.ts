@@ -11,12 +11,12 @@ export interface ItemRef {
 
 export interface ReportItem {
     id: Id;
-    el: string;
     columns?: ItemRef[];
-    rows?: ItemRef[];
+    el: string;
     filters?: ItemRef[];
-    reportType: ReportType;
     mapViews?: MapView[];
+    reportType: ReportType;
+    rows?: ItemRef[];
 }
 
 export type MapView = {
@@ -48,6 +48,8 @@ export interface DashboardItem {
     visualization: Visualization;
     eventReport: EventReport;
     eventChart: EventChart;
+    width: number;
+    height: number;
 }
 
 export interface Visualization {
@@ -92,6 +94,8 @@ export class Dashboard {
                 return {
                     ...this.getReportInformation(dashboardItem),
                     elementId: dashboardItem.id,
+                    width: dashboardItem.width,
+                    height: dashboardItem.height,
                 };
             });
     }
@@ -101,21 +105,21 @@ export class Dashboard {
             return {
                 ...dashboardItem,
                 reportType: "mapPlugin",
-                reportTitle: dashboardItem.map.name,
+                reportTitle: dashboardItem.map.name.trim(),
                 reportId: dashboardItem.map.id,
             };
         } else if (dashboardItem.eventChart) {
             return {
                 ...dashboardItem,
                 reportType: "eventChartPlugin",
-                reportTitle: dashboardItem.eventChart.name,
+                reportTitle: dashboardItem.eventChart.name.trim(),
                 reportId: dashboardItem.eventChart.id,
             };
         } else if (dashboardItem.eventReport) {
             return {
                 ...dashboardItem,
                 reportType: "eventReportPlugin",
-                reportTitle: dashboardItem.eventReport.name,
+                reportTitle: dashboardItem.eventReport.name.trim(),
                 reportId: dashboardItem.eventReport.id,
             };
         } else {
@@ -125,7 +129,7 @@ export class Dashboard {
             return {
                 ...dashboardItem,
                 reportType,
-                reportTitle: dashboardItem.visualization.name,
+                reportTitle: dashboardItem.visualization.name.trim(),
                 reportId: dashboardItem.visualization.id,
             };
         }

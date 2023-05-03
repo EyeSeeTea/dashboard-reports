@@ -14,7 +14,7 @@ import { DashboardItem, ReportItem } from "../../../domain/entities/Dashboard";
 import { DashboardFilter, DashboardFilterData } from "../../components/dashboard-filter/DashboardFilter";
 import { DashboardSettings } from "../../components/dashboard-settings/DashboardSettings";
 import i18n from "../../../locales";
-import { Settings } from "../../../domain/entities/Settings";
+import { Settings, TemplateReport } from "../../../domain/entities/Settings";
 import { useDashboard } from "../../hooks/useDashboard";
 import { useSettings } from "../../hooks/useSettings";
 import { useReports } from "../../hooks/useReports";
@@ -64,10 +64,9 @@ export const DashboardReports: React.FC = React.memo(() => {
     const snackbar = useSnackbar();
     const loading = useLoading();
     const { dashboards } = useDashboard();
-    const { settings, saveSettings } = useSettings();
+    const { selectedReport, settings, saveSettings, setSelectedReport } = useSettings();
     const [dialogState, setDialogState] = React.useState(false);
     const [dashboard, setDashboard] = React.useState<DashboardFilterData>();
-    const [report, setReport] = React.useState<string>("");
     useReports({ dashboard });
 
     const filterIsEmpty = !dashboard?.dashboard;
@@ -143,34 +142,22 @@ export const DashboardReports: React.FC = React.memo(() => {
             });
     }
 
-    const generateRawReport = () => {
+    const generateRawReport = (template: TemplateReport) => {
         if (dashboard?.dashboard?.name && settings) {
             const dashboardTitle = dashboard?.dashboard?.name;
             const imagesPromises = getImagesFromDom(dashboard.dashboard.dashboardItems);
 
             Promise.all(imagesPromises)
                 .then(docxItems => {
-                    return compositionRoot.exportRepository.saveRawReport.execute(docxItems, dashboardTitle, settings);
+                    return compositionRoot.exportRepository.saveReport.execute(
+                        docxItems,
+                        dashboardTitle,
+                        settings,
+                        template
+                    );
                 })
                 .then(blob => {
-                    saveAs(blob, "raw.docx");
-                })
-                .finally(() => {
-                    loading.hide();
-                });
-        }
-    };
-
-    const generateComplexReport = () => {
-        if (dashboard?.dashboard && settings) {
-            const imagesPromises = getImagesFromDom(dashboard.dashboard.dashboardItems);
-
-            Promise.all(imagesPromises)
-                .then(docxItems => {
-                    return compositionRoot.exportRepository.saveComplexReport.execute(docxItems, settings);
-                })
-                .then(blob => {
-                    saveAs(blob, "complex.docx");
+                    saveAs(blob, `${selectedReport?.fileName}.docx`);
                 })
                 .finally(() => {
                     loading.hide();
@@ -180,17 +167,16 @@ export const DashboardReports: React.FC = React.memo(() => {
 
     const onChangeExport = (event: React.ChangeEvent<{ value: unknown }>) => {
         const value = event.target.value as string;
-        setReport(value);
+        const template = settings?.templates.find(t => t.name === value);
+        if (template) {
+            setSelectedReport(template);
+        }
     };
 
     const onExport = () => {
-        if (report) {
+        if (selectedReport) {
             loading.show();
-            if (report === "raw") {
-                generateRawReport();
-            } else {
-                generateComplexReport();
-            }
+            generateRawReport(selectedReport);
         } else {
             snackbar.openSnackbar("info", i18n.t("Select a Report"), {
                 autoHideDuration: 3000,
@@ -209,21 +195,28 @@ export const DashboardReports: React.FC = React.memo(() => {
             <DashboardFilter dashboards={dashboards} onChange={onChange}>
                 {dashboard?.dashboard && (
                     <>
-                        <SelectReportContainer>
-                            <InputLabel id="select-report-label">{i18n.t("Select Report")}</InputLabel>
+                        {settings && selectedReport && (
+                            <SelectReportContainer>
+                                <InputLabel id="select-report-label">{i18n.t("Select Report")}</InputLabel>
 
-                            <Select
-                                labelId="select-report-label"
-                                id="reports-select"
-                                name="reports-select"
-                                onChange={onChangeExport}
-                                value={report}
-                                fullWidth
-                            >
-                                <MenuItem value="raw">{i18n.t("Raw Report")}</MenuItem>
-                                <MenuItem value="complex">{i18n.t("Complex Report")}</MenuItem>
-                            </Select>
-                        </SelectReportContainer>
+                                <Select
+                                    labelId="select-report-label"
+                                    id="reports-select"
+                                    name="reports-select"
+                                    onChange={onChangeExport}
+                                    value={selectedReport.name}
+                                    fullWidth
+                                >
+                                    {settings?.templates.map(template => {
+                                        return (
+                                            <MenuItem key={template.name} value={template.name}>
+                                                {template.name}
+                                            </MenuItem>
+                                        );
+                                    })}
+                                </Select>
+                            </SelectReportContainer>
+                        )}
 
                         <Button color="primary" variant="contained" onClick={onExport}>
                             {i18n.t("Export to Word")}

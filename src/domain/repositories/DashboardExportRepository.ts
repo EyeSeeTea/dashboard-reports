@@ -1,7 +1,11 @@
 import { DashboardImage } from "../DashboardImage";
-import { Settings } from "../entities/Settings";
+import { Settings, TemplateReport } from "../entities/Settings";
 
 export interface DashboardExportRepository {
-    saveRawReport(dashboardImages: DashboardImage[], title: string, settings: Settings): Promise<Blob>;
-    saveComplexReport(dashboardImages: DashboardImage[], settings: Settings): Promise<Blob>;
+    saveReport(
+        dashboardImages: DashboardImage[],
+        title: string,
+        settings: Settings,
+        template: TemplateReport
+    ): Promise<Blob>;
 }

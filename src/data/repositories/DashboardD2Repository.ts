@@ -119,6 +119,8 @@ const dashboardFields = {
             rows: true,
             columns: true,
         },
+        width: true,
+        height: true,
         reportType: true,
         map: {
             id: true,

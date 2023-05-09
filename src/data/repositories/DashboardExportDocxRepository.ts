@@ -3,9 +3,9 @@ import { DashboardImage } from "../../domain/DashboardImage";
 import { Settings, TemplateReport } from "../../domain/entities/Settings";
 import { DashboardExportRepository } from "../../domain/repositories/DashboardExportRepository";
 
-function calculateAspectRatioFit(srcWidth: number, srcHeight: number, maxHeight = 400) {
+function calculateAspectRatioFit(srcWidth: number, srcHeight: number, maxWidth: number, maxHeight: number) {
     if (!srcWidth || !srcHeight) return { imageWidth: 0, imageHeight: 0 };
-    const ratio = Math.min(400 / srcWidth, maxHeight / srcHeight);
+    const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
 
     return { imageWidth: srcWidth * ratio, imageHeight: srcHeight * ratio };
 }
@@ -26,18 +26,23 @@ export class DashboardExportDocxRepository implements DashboardExportRepository 
         settings: Settings,
         template: TemplateReport
     ): Promise<Blob> {
-        return this.generateDataForTemplate(template.template, docsItems, settings, title);
+        return this.generateDataForTemplate(template, docsItems, settings, title);
     }
 
     private generateDataForTemplate(
-        templateBase64: string,
+        template: TemplateReport,
         docsItems: DashboardImage[],
         settings: Settings,
         title: string
     ): Promise<Blob> {
-        const templateFile = new Blob([base64ToArrayBuffer(templateBase64)]);
+        const templateFile = new Blob([base64ToArrayBuffer(template.template)]);
         const visualizations = docsItems.map(item => {
-            const { imageHeight, imageWidth } = calculateAspectRatioFit(item.width, item.height);
+            const { imageHeight, imageWidth } = calculateAspectRatioFit(
+                item.width,
+                item.height,
+                template.maxWidth || 400,
+                template.maxHeight || 400
+            );
             return {
                 title: this.createTextInXml(item.title, settings.fontSize),
                 image: {

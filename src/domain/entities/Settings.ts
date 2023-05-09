@@ -5,6 +5,8 @@ export type TemplateReport = {
     name: string;
     fileName: string;
     template: string;
+    maxHeight: number;
+    maxWidth: number;
 };
 export interface Settings {
     id: string;

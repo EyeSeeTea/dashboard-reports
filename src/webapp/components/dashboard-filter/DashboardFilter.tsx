@@ -32,8 +32,8 @@ function getPeriod(lastMonths: boolean, date: string): ReportPeriod {
         ? {
               type: "lastMonths",
               value: {
-                  lastFourMonths: lastMonths,
                   ...formatDate(date),
+                  lastFourMonths: lastMonths,
               },
           }
         : {

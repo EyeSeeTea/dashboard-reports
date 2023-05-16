@@ -16,8 +16,9 @@ export function useSettings() {
             compositionRoot.settings.get.execute().run(
                 settings => {
                     setSettings(settings);
-                    if (settings.templates.length > 0) {
-                        setSelectedReport(settings.templates[0]);
+                    const firstTemplate = settings.templates[0];
+                    if (firstTemplate) {
+                        setSelectedReport(firstTemplate);
                     } else {
                         snackbar.warning(i18n.t("Templates not found"));
                     }

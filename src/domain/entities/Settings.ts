@@ -1,10 +1,12 @@
 export const SETTINGS_CODE = "dashboard-reports";
 export const DEFAULT_FONT_SIZE = "8";
 
+type Base64String = string;
+
 export type TemplateReport = {
     name: string;
     fileName: string;
-    template: string;
+    template: Base64String;
     maxHeight: number;
     maxWidth: number;
 };

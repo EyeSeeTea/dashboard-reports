@@ -1,6 +1,4 @@
 import React from "react";
-import html2canvas from "html2canvas";
-import { saveAs } from "file-saver";
 import styled from "styled-components";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -14,60 +12,19 @@ import { DashboardItem, ReportItem } from "../../../domain/entities/Dashboard";
 import { DashboardFilter, DashboardFilterData } from "../../components/dashboard-filter/DashboardFilter";
 import { DashboardSettings } from "../../components/dashboard-settings/DashboardSettings";
 import i18n from "../../../locales";
-import { Settings, TemplateReport } from "../../../domain/entities/Settings";
+import { Settings } from "../../../domain/entities/Settings";
 import { useDashboard } from "../../hooks/useDashboard";
 import { useSettings } from "../../hooks/useSettings";
 import { useReports } from "../../hooks/useReports";
-import { useAppContext } from "../../contexts/app-context";
-
-function convertSvgToPng(input: HTMLElement): Promise<HTMLCanvasElement> {
-    const promise = new Promise<HTMLCanvasElement>((resolve, reject) => {
-        const svgData = new XMLSerializer().serializeToString(input);
-        const svgDataBase64 = btoa(unescape(encodeURIComponent(svgData)));
-        const svgDataUrl = `data:image/svg+xml;charset=utf-8;base64,${svgDataBase64}`;
-
-        const image = new Image();
-
-        image.addEventListener("load", () => {
-            const width = input.getAttribute("width") || "0";
-            const height = input.getAttribute("height") || "0";
-            const canvas = document.createElement("canvas");
-
-            canvas.setAttribute("width", width);
-            canvas.setAttribute("height", height);
-
-            const context = canvas.getContext("2d") as CanvasRenderingContext2D;
-            context.drawImage(image, 0, 0, Number(width), Number(height));
-
-            resolve(canvas);
-        });
-
-        image.addEventListener("error", reject);
-
-        image.src = svgDataUrl;
-    });
-
-    return promise;
-}
-
-function getCanvasInformation(dashboardItem: DocxItem, canvas: HTMLCanvasElement) {
-    return {
-        ...dashboardItem,
-        base64: canvas.toDataURL(),
-        width: dashboardItem.width ? dashboardItem.width : canvas.width,
-        height: dashboardItem.height ? dashboardItem.height : canvas.width,
-    };
-}
 
 export const DashboardReports: React.FC = React.memo(() => {
-    const { compositionRoot } = useAppContext();
     const snackbar = useSnackbar();
     const loading = useLoading();
     const { dashboards } = useDashboard();
     const { selectedReport, settings, saveSettings, setSelectedReport } = useSettings();
     const [dialogState, setDialogState] = React.useState(false);
     const [dashboard, setDashboard] = React.useState<DashboardFilterData>();
-    useReports({ dashboard });
+    const { generateDocxReport } = useReports({ dashboard, settings });
 
     const filterIsEmpty = !dashboard?.dashboard;
 
@@ -88,83 +45,6 @@ export const DashboardReports: React.FC = React.memo(() => {
         setDialogState(false);
     };
 
-    function getImagesFromDom(dashboardItems: DashboardItem[]) {
-        return dashboardItems
-            .map(dashboardItem => {
-                const newEl: DocxItem = {
-                    title: dashboardItem.reportTitle,
-                    domEl: null,
-                    base64: "",
-                    width: 0,
-                    height: 0,
-                };
-                const $vizDomEl = document.querySelector(`#${dashboardItem.elementId}`);
-
-                if (dashboardItem.reportType === "mapPlugin") {
-                    const canvasEl = $vizDomEl?.querySelector("canvas") as HTMLCanvasElement;
-                    if (canvasEl) {
-                        newEl.base64 = canvasEl.toDataURL();
-                        newEl.width = canvasEl.width;
-                        newEl.height = canvasEl.height;
-                    }
-                } else if (
-                    dashboardItem.reportType === "chartPlugin" ||
-                    dashboardItem.reportType === "eventChartPlugin"
-                ) {
-                    newEl.domEl = $vizDomEl?.querySelector("svg") as SVGElement;
-                } else if (
-                    dashboardItem.reportType === "reportTablePlugin" ||
-                    dashboardItem.reportType === "eventReportPlugin"
-                ) {
-                    newEl.domEl = $vizDomEl?.querySelector("table") as HTMLTableElement;
-                    const tableRects = newEl.domEl?.getClientRects();
-                    if (tableRects[0]) {
-                        newEl.width = tableRects[0].width;
-                        newEl.height = tableRects[0].height;
-                    }
-                }
-                return newEl;
-            })
-            .map(dashboardItem => {
-                if (dashboardItem.domEl) {
-                    if (dashboardItem.domEl.tagName === "svg") {
-                        return convertSvgToPng(dashboardItem.domEl as HTMLElement).then(canvas =>
-                            getCanvasInformation(dashboardItem, canvas)
-                        );
-                    } else {
-                        return html2canvas(dashboardItem.domEl as HTMLElement).then(canvas =>
-                            getCanvasInformation(dashboardItem, canvas)
-                        );
-                    }
-                } else {
-                    return dashboardItem;
-                }
-            });
-    }
-
-    const generateRawReport = (template: TemplateReport) => {
-        if (dashboard?.dashboard?.name && settings) {
-            const dashboardTitle = dashboard?.dashboard?.name;
-            const imagesPromises = getImagesFromDom(dashboard.dashboard.dashboardItems);
-
-            Promise.all(imagesPromises)
-                .then(docxItems => {
-                    return compositionRoot.exportRepository.saveReport.execute(
-                        docxItems,
-                        dashboardTitle,
-                        settings,
-                        template
-                    );
-                })
-                .then(blob => {
-                    saveAs(blob, `${selectedReport?.fileName}.docx`);
-                })
-                .finally(() => {
-                    loading.hide();
-                });
-        }
-    };
-
     const onChangeExport = (event: React.ChangeEvent<{ value: unknown }>) => {
         const value = event.target.value as string;
         const template = settings?.templates.find(t => t.name === value);
@@ -176,7 +56,7 @@ export const DashboardReports: React.FC = React.memo(() => {
     const onExport = () => {
         if (selectedReport) {
             loading.show();
-            generateRawReport(selectedReport);
+            generateDocxReport(selectedReport);
         } else {
             snackbar.openSnackbar("info", i18n.t("Select a Report"), {
                 autoHideDuration: 3000,
@@ -310,14 +190,6 @@ interface PluginData {
     username: string;
     password: string;
     load(reports: ReportItem[]): void;
-}
-
-interface DocxItem {
-    title: string;
-    domEl: Element | null;
-    base64: string;
-    width: number;
-    height: number;
 }
 
 DashboardReports.displayName = "DashboardReports";

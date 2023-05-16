@@ -35,8 +35,8 @@ export function getCompositionRoot(api: D2Api, instance: Instance) {
             get: new GetSettingsUseCase(settingsRepository),
             save: new SaveSettingsUseCase(settingsRepository),
         },
-        exportRepository: {
-            saveReport: new SaveRawReportUseCase(exportDocxRepository),
+        export: {
+            save: new SaveRawReportUseCase(exportDocxRepository),
         },
     };
 }

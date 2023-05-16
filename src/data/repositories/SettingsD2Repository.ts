@@ -42,10 +42,14 @@ export class SettingsD2Repository implements SettingsRepository {
                         id: settings.id,
                         code: SETTINGS_CODE,
                         name: SETTINGS_CODE,
-                        description: JSON.stringify({
-                            fontSize: settings.fontSize,
-                            templates: settings.templates,
-                        }),
+                        description: JSON.stringify(
+                            {
+                                fontSize: settings.fontSize,
+                                templates: settings.templates,
+                            },
+                            null,
+                            2
+                        ),
                         value: 1,
                     },
                 ],

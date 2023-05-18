@@ -1,19 +1,27 @@
 import React from "react";
 import { useAppContext } from "../contexts/app-context";
 import { useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
-import { Settings } from "../../domain/entities/Settings";
+import { Settings, TemplateReport } from "../../domain/entities/Settings";
+import i18n from "../../locales";
 
 export function useSettings() {
     const snackbar = useSnackbar();
     const loading = useLoading();
     const { compositionRoot, api } = useAppContext();
     const [settings, setSettings] = React.useState<Settings>();
+    const [selectedReport, setSelectedReport] = React.useState<TemplateReport | undefined>();
 
     React.useEffect(() => {
         function fetchSettings() {
             compositionRoot.settings.get.execute().run(
                 settings => {
                     setSettings(settings);
+                    const firstTemplate = settings.templates[0];
+                    if (firstTemplate) {
+                        setSelectedReport(firstTemplate);
+                    } else {
+                        snackbar.warning(i18n.t("Templates not found"));
+                    }
                 },
                 err => {
                     snackbar.openSnackbar("error", err);
@@ -42,7 +50,9 @@ export function useSettings() {
     );
 
     return {
+        selectedReport,
         saveSettings,
         settings,
+        setSelectedReport,
     };
 }

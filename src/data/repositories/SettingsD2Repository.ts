@@ -28,6 +28,7 @@ export class SettingsD2Repository implements SettingsRepository {
             const settings: Settings = {
                 id: constant ? constant.id : getUid("settings"),
                 fontSize: constant ? (JSON.parse(constant.description) as Settings).fontSize : DEFAULT_FONT_SIZE,
+                templates: constant ? (JSON.parse(constant.description) as Settings).templates : [],
             };
             return settings;
         });
@@ -41,7 +42,14 @@ export class SettingsD2Repository implements SettingsRepository {
                         id: settings.id,
                         code: SETTINGS_CODE,
                         name: SETTINGS_CODE,
-                        description: JSON.stringify({ fontSize: settings.fontSize }),
+                        description: JSON.stringify(
+                            {
+                                fontSize: settings.fontSize,
+                                templates: settings.templates,
+                            },
+                            null,
+                            2
+                        ),
                         value: 1,
                     },
                 ],

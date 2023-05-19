@@ -85,3 +85,86 @@ The file `src/contexts/app-context.ts` holds some general context so typical inf
 ### Scripts
 
 Check the example script, entry `"script-example"`in `package.json`->scripts and `src/scripts/example.ts`.
+
+### About Plugins
+
+Right now the application support 5 different plugins:
+
+| Report        | plugin filename |
+| ------------- | --------------- |
+| Pivot Tables  | reporttable.js  |
+| Event Charts  | eventchart.js   |
+| Event Reports | eventreport.js  |
+| Maps          | map.js          |
+| Charts        | chart.js        |
+
+You can see within the **public** folder the following folder structure:
+
+```
+/236
+  reporttable.min.js
+  eventchart.min.js
+  # all the other plugins
+
+/237
+  reporttable.min.js
+  eventchart.min.js
+  # all the other plugins
+
+/238
+  reporttable.min.js
+  eventchart.min.js
+  # all the other plugins
+```
+
+because plugins can have different functionality depending on the dhis version you're using. That's why in order to load all the plugins we make an http request to get the version and then it loads all the necessary scripts from the folder with the specific version we need.
+
+### Adding a new version
+
+If you want to add a new version the first thing to do is download the .war file from the [releases page](https://releases.dhis2.org/). Pick the version you want.
+
+Now you need to unzip the war file into a folder in your computer
+
+```bash
+unzip ./dhis2-stable-2.39.0.war -d ./war-239
+```
+
+**war-239** is a random name for the folder you can use whatever name you want.
+
+Now go into the new folder and try to find all of the plugins
+
+```bash
+cd war-239
+find | grep '\(eventreport\|reporttable\|chart\|map\)\.js$'
+```
+
+It's going to give you the path of all the files (not all the versions have the plugins in the same paths)
+
+```bash
+./dhis-web-event-visualizer/eventchart.js
+./dhis-web-event-reports/eventreport.js
+./dhis-web-maps/map.js
+./dhis-web-interpretation/chart.js
+./dhis-web-interpretation/reporttable.js
+```
+
+now in this repo inside the **public** folder create a new folder with the version you want to add (only including major and minor values for this example the folder is going to be **239**)
+
+```bash
+/public
+  /239
+```
+
+Now you can copy all the files inside the folder. As a final step please add the word ".min" to the every file so prettier does not try to do its magic on them.
+
+```bash
+/public
+  /239
+    reporttable.min.js
+    eventchart.min.js
+    eventreport.min.js
+    map.min.js
+    chart.min.js
+```
+
+Now you can start the server and check if every visualization is working properly.

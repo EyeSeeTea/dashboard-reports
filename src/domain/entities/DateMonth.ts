@@ -3,13 +3,14 @@ import _ from "lodash";
 export type DateMonth = {
     year: number;
     month: number;
+    lastFourMonths: boolean;
 };
 
 export type PeriodItem = {
     id: string;
 };
 
-export type ReportPeriod = { type: "dateMonth"; value: DateMonth } | { type: "lastMonths"; value: boolean };
+export type ReportPeriod = { type: "dateMonth"; value: DateMonth } | { type: "lastMonths"; value: DateMonth };
 
 function getRangeValue(reportPeriod: ReportPeriod) {
     if (reportPeriod.type === "lastMonths") {
@@ -23,16 +24,17 @@ function getRangeValue(reportPeriod: ReportPeriod) {
 
 export function generatePeriods(reportPeriod: ReportPeriod): PeriodItem[] {
     const rangeValue = getRangeValue(reportPeriod);
-
     const dates = _(0)
         .range(rangeValue)
         .map(index => {
+            const lastFourMonths = reportPeriod.type === "lastMonths";
+            const { month, year } = reportPeriod.value;
             const currentDate =
-                reportPeriod.type === "dateMonth"
-                    ? new Date(reportPeriod.value.year, reportPeriod.value.month - 1)
-                    : new Date();
+                month && year ? new Date(reportPeriod.value.year, reportPeriod.value.month - 1) : new Date();
             currentDate.setDate(1);
-            currentDate.setMonth(currentDate.getMonth() - index);
+            currentDate.setMonth(
+                lastFourMonths ? currentDate.getMonth() - (rangeValue - 1 - index) : currentDate.getMonth() - index
+            );
             return currentDate;
         })
         .map(currentDate => {

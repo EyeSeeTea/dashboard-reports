@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { Id, Ref } from "./Ref";
 
 export type ReportType = "reportTablePlugin" | "chartPlugin" | "mapPlugin" | "eventChartPlugin" | "eventReportPlugin";
@@ -11,12 +12,12 @@ export interface ItemRef {
 
 export interface ReportItem {
     id: Id;
-    el: string;
     columns?: ItemRef[];
-    rows?: ItemRef[];
+    el: string;
     filters?: ItemRef[];
-    reportType: ReportType;
     mapViews?: MapView[];
+    reportType: ReportType;
+    rows?: ItemRef[];
 }
 
 export type MapView = {
@@ -48,6 +49,8 @@ export interface DashboardItem {
     visualization: Visualization;
     eventReport: EventReport;
     eventChart: EventChart;
+    width: number;
+    height: number;
 }
 
 export interface Visualization {
@@ -79,21 +82,26 @@ export class Dashboard {
     constructor(data: DashboardData) {
         this.id = data.id;
         this.name = data.name;
-        this.dashboardItems = data.dashboardItems
+
+        this.dashboardItems = _(data.dashboardItems)
             .filter(dashboardItem => {
-                return (
+                return Boolean(
                     dashboardItem.visualization ||
-                    dashboardItem.map ||
-                    dashboardItem.eventChart ||
-                    dashboardItem.eventReport
+                        dashboardItem.map ||
+                        dashboardItem.eventChart ||
+                        dashboardItem.eventReport
                 );
             })
             .map(dashboardItem => {
                 return {
                     ...this.getReportInformation(dashboardItem),
                     elementId: dashboardItem.id,
+                    width: dashboardItem.width,
+                    height: dashboardItem.height,
                 };
-            });
+            })
+            .uniqBy("reportId")
+            .value();
     }
 
     private getReportInformation(dashboardItem: DashboardItem): DashboardItem {
@@ -101,21 +109,21 @@ export class Dashboard {
             return {
                 ...dashboardItem,
                 reportType: "mapPlugin",
-                reportTitle: dashboardItem.map.name,
+                reportTitle: dashboardItem.map.name.trim(),
                 reportId: dashboardItem.map.id,
             };
         } else if (dashboardItem.eventChart) {
             return {
                 ...dashboardItem,
                 reportType: "eventChartPlugin",
-                reportTitle: dashboardItem.eventChart.name,
+                reportTitle: dashboardItem.eventChart.name.trim(),
                 reportId: dashboardItem.eventChart.id,
             };
         } else if (dashboardItem.eventReport) {
             return {
                 ...dashboardItem,
                 reportType: "eventReportPlugin",
-                reportTitle: dashboardItem.eventReport.name,
+                reportTitle: dashboardItem.eventReport.name.trim(),
                 reportId: dashboardItem.eventReport.id,
             };
         } else {
@@ -125,7 +133,7 @@ export class Dashboard {
             return {
                 ...dashboardItem,
                 reportType,
-                reportTitle: dashboardItem.visualization.name,
+                reportTitle: dashboardItem.visualization.name.trim(),
                 reportId: dashboardItem.visualization.id,
             };
         }

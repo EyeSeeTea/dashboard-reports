@@ -10,21 +10,17 @@ import i18n from "../../../locales";
 
 export const DashboardSettings: React.FC<DashboardSettingsProps> = React.memo(
     ({ dialogState, onSubmitForm, onDialogClose, settings }) => {
-        const [fontSize, setFontSize] = React.useState(() => {
-            return settings.fontSize;
-        });
-
         const onSubmit: React.FormEventHandler<HTMLFormElement> = e => {
             e.preventDefault();
+            const formElements = e.target as typeof e.target & {
+                fontSize: { value: string };
+            };
             const settingsToSave: Settings = {
                 id: settings.id,
-                fontSize,
+                fontSize: formElements.fontSize.value,
+                templates: settings.templates,
             };
             onSubmitForm(settingsToSave);
-        };
-
-        const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-            setFontSize(event.target.value);
         };
 
         return (
@@ -34,12 +30,11 @@ export const DashboardSettings: React.FC<DashboardSettingsProps> = React.memo(
                 <DialogContent>
                     <form id="settingsform" onSubmit={onSubmit}>
                         <TextField
-                            id="font-size"
-                            name="font-size"
+                            id="fontsize"
+                            name="fontSize"
                             label={i18n.t("Font Size")}
                             required
-                            value={fontSize}
-                            onChange={onChange}
+                            defaultValue={settings.fontSize}
                         />
                     </form>
                 </DialogContent>

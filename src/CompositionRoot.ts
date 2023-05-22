@@ -12,7 +12,6 @@ import { GetSettingsUseCase } from "./domain/usecases/GetSettingsUseCase";
 import { SettingsD2Repository } from "./data/repositories/SettingsD2Repository";
 import { SaveRawReportUseCase } from "./domain/usecases/SaveRawReportUseCase";
 import { DashboardExportDocxRepository } from "./data/repositories/DashboardExportDocxRepository";
-import { SaveComplexReportUseCase } from "./domain/usecases/SaveComplexReportUseCase";
 
 export function getCompositionRoot(api: D2Api, instance: Instance) {
     const instanceRepository = new InstanceDefaultRepository(instance);
@@ -36,9 +35,8 @@ export function getCompositionRoot(api: D2Api, instance: Instance) {
             get: new GetSettingsUseCase(settingsRepository),
             save: new SaveSettingsUseCase(settingsRepository),
         },
-        exportRepository: {
-            saveRawReport: new SaveRawReportUseCase(exportDocxRepository),
-            saveComplexReport: new SaveComplexReportUseCase(exportDocxRepository),
+        export: {
+            save: new SaveRawReportUseCase(exportDocxRepository),
         },
     };
 }

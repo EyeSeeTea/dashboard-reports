@@ -1,4 +1,4 @@
-export const SETTINGS_CODE = "dashboard-reports";
+export const SETTINGS_CODE = "DASHBOARD_REPORTS";
 export const DEFAULT_FONT_SIZE = "8";
 
 type Base64String = string;

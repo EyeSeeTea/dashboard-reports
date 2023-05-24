@@ -13,5 +13,6 @@ export type TemplateReport = {
 export interface Settings {
     id: string;
     fontSize: string;
+    showFeedback: boolean;
     templates: TemplateReport[];
 }

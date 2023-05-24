@@ -30,9 +30,10 @@ export const App: React.FC<AppProps> = React.memo(function App({ api, d2, instan
             const isDev = process.env.NODE_ENV === "development";
             const compositionRoot = getCompositionRoot(api, instance);
             const currentUser = (await compositionRoot.users.getCurrent.execute().runAsync()).data;
+            const settings = (await compositionRoot.settings.get.execute().runAsync()).data;
             if (!currentUser) throw new Error("User not logged in");
 
-            setAppContext({ api, currentUser, compositionRoot, isDev });
+            setAppContext({ api, currentUser, compositionRoot, isDev, settings, setAppContext });
             setLoading(false);
         }
         setup();
@@ -47,7 +48,7 @@ export const App: React.FC<AppProps> = React.memo(function App({ api, d2, instan
                     <SnackbarProvider>
                         <HeaderBar appName="Dashboard Reports" />
 
-                        {appConfig.feedback && appContext && (
+                        {appConfig.feedback && appContext && appContext.settings?.showFeedback && (
                             <Feedback options={appConfig.feedback} username={appContext.currentUser.username} />
                         )}
 

@@ -25,10 +25,20 @@ export class SettingsD2Repository implements SettingsRepository {
             })
         ).map(d2Response => {
             const constant = d2Response.objects[0];
+            const descriptionJson = (
+                constant
+                    ? JSON.parse(constant.description)
+                    : {
+                          fontSize: DEFAULT_FONT_SIZE,
+                          templates: [],
+                          showFeedback: false,
+                      }
+            ) as Settings;
             const settings: Settings = {
                 id: constant ? constant.id : getUid("settings"),
-                fontSize: constant ? (JSON.parse(constant.description) as Settings).fontSize : DEFAULT_FONT_SIZE,
-                templates: constant ? (JSON.parse(constant.description) as Settings).templates : [],
+                fontSize: descriptionJson.fontSize,
+                templates: descriptionJson.templates,
+                showFeedback: descriptionJson.showFeedback,
             };
             return settings;
         });
@@ -46,6 +56,7 @@ export class SettingsD2Repository implements SettingsRepository {
                             {
                                 fontSize: settings.fontSize,
                                 templates: settings.templates,
+                                showFeedback: settings.showFeedback,
                             },
                             null,
                             2

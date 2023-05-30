@@ -117,7 +117,7 @@ You can see within the **public** folder the following folder structure:
   # all the other plugins
 ```
 
-because plugins can have different functionality depending on the dhis version you're using. That's why in order to load all the plugins we make an http request to get the version and then it loads all the necessary scripts from the folder with the specific version we need.
+Plugins have different functionality depending on the DHIS2 version, so we first get the version and then load all the scripts from the specific folder.
 
 ### Adding a new version
 
@@ -126,21 +126,19 @@ If you want to add a new version the first thing to do is download the .war file
 Now you need to unzip the war file into a folder in your computer
 
 ```bash
-unzip ./dhis2-stable-2.39.0.war -d ./war-239
+$ unzip ./dhis2-stable-2.39.0.war -d ./war-239
 ```
 
-**war-239** is a random name for the folder you can use whatever name you want.
-
-Now go into the new folder and try to find all of the plugins
+Now go into the new folder and find the plugins:
 
 ```bash
-cd war-239
-find | grep '\(eventreport\|reporttable\|chart\|map\)\.js$'
+$ cd war-239
+$ find | grep '\(eventreport\|reporttable\|chart\|map\)\.js$'
 ```
 
-It's going to give you the path of all the files (not all the versions have the plugins in the same paths)
+Which returns the path to plugin scripts (not all the versions have the plugins in the same paths):
 
-```bash
+```
 ./dhis-web-event-visualizer/eventchart.js
 ./dhis-web-event-reports/eventreport.js
 ./dhis-web-maps/map.js
@@ -148,16 +146,16 @@ It's going to give you the path of all the files (not all the versions have the 
 ./dhis-web-interpretation/reporttable.js
 ```
 
-now in this repo inside the **public** folder create a new folder with the version you want to add (only including major and minor values for this example the folder is going to be **239**)
+Inside **public**, create a new folder with the version (example: `239`) you want to add:
 
-```bash
+```
 /public
   /239
 ```
 
-Now you can copy all the files inside the folder. As a final step please add the word ".min" to the every file so prettier does not try to do its magic on them.
+Now copy all files inside the folder. As a final step, please add the word ".min" to the every file so prettier does not try to do its magic on them.
 
-```bash
+```
 /public
   /239
     reporttable.min.js

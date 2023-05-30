@@ -1,6 +1,6 @@
 {
     "name": "dashboard-reports",
-    "description": "Dashboard Reports for MSF",
+    "description": "Dashboard Reports",
     "version": "0.2.0",
     "license": "GPL-3.0",
     "author": "EyeSeeTea team",
@@ -110,8 +110,8 @@
         "script-example": "npx ts-node src/scripts/example.ts"
     },
     "manifest.webapp": {
-        "name": "Dashboard Reports for MSF",
-        "description": "Dashboard Reports for MSF",
+        "name": "Dashboard Reports",
+        "description": "Dashboard Reports",
         "icons": {
             "48": "icon.png"
         },

@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { Id, Ref } from "./Ref";
 
 export type ReportType = "reportTablePlugin" | "chartPlugin" | "mapPlugin" | "eventChartPlugin" | "eventReportPlugin";
@@ -81,13 +82,14 @@ export class Dashboard {
     constructor(data: DashboardData) {
         this.id = data.id;
         this.name = data.name;
-        this.dashboardItems = data.dashboardItems
+
+        this.dashboardItems = _(data.dashboardItems)
             .filter(dashboardItem => {
-                return (
+                return Boolean(
                     dashboardItem.visualization ||
-                    dashboardItem.map ||
-                    dashboardItem.eventChart ||
-                    dashboardItem.eventReport
+                        dashboardItem.map ||
+                        dashboardItem.eventChart ||
+                        dashboardItem.eventReport
                 );
             })
             .map(dashboardItem => {
@@ -97,7 +99,9 @@ export class Dashboard {
                     width: dashboardItem.width,
                     height: dashboardItem.height,
                 };
-            });
+            })
+            .uniqBy("reportId")
+            .value();
     }
 
     private getReportInformation(dashboardItem: DashboardItem): DashboardItem {

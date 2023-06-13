@@ -9,15 +9,18 @@ import { GetDashboardsUseCase } from "./domain/usecases/GetDashboardsUseCase";
 import { GetReportsUseCase } from "./domain/usecases/GetReportsUseCase";
 import { SaveSettingsUseCase } from "./domain/usecases/SaveSettingsUseCase";
 import { GetSettingsUseCase } from "./domain/usecases/GetSettingsUseCase";
-import { SettingsD2Repository } from "./data/repositories/SettingsD2Repository";
+import { ConstantD2Repository } from "./data/repositories/ConstantD2Repository";
 import { SaveRawReportUseCase } from "./domain/usecases/SaveRawReportUseCase";
 import { DashboardExportDocxRepository } from "./data/repositories/DashboardExportDocxRepository";
+import { StorageName } from "./domain/entities/Settings";
+import { DataStoreD2Repository } from "./data/repositories/DataStoreD2Repository";
 
-export function getCompositionRoot(api: D2Api, instance: Instance) {
+export function getCompositionRoot(api: D2Api, instance: Instance, storageName: StorageName) {
     const instanceRepository = new InstanceDefaultRepository(instance);
     const usersRepository = new UserD2Repository(api);
     const dashboardRepository = new DashboardD2Repository(api);
-    const settingsRepository = new SettingsD2Repository(api);
+    const settingsRepository =
+        storageName === "datastore" ? new DataStoreD2Repository(api) : new ConstantD2Repository(api);
     const exportDocxRepository = new DashboardExportDocxRepository();
 
     return {

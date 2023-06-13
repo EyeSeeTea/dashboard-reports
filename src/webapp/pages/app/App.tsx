@@ -8,6 +8,7 @@ import React, { useEffect, useState } from "react";
 import { appConfig } from "../../../app-config";
 import { getCompositionRoot } from "../../../CompositionRoot";
 import { Instance } from "../../../data/entities/Instance";
+import { Settings, StorageName } from "../../../domain/entities/Settings";
 import { D2Api } from "../../../types/d2-api";
 import { AppContext, AppContextState } from "../../contexts/app-context";
 import { Router } from "../Router";
@@ -21,6 +22,13 @@ export interface AppProps {
     instance: Instance;
 }
 
+function getSettings(settingsFromStorage: Settings | undefined, defaultSettings: Settings): Settings {
+    if (!settingsFromStorage) throw new Error("Cannot load settings");
+    const hasTemplates = settingsFromStorage ? settingsFromStorage.templates.length > 0 : false;
+    const settings = hasTemplates ? settingsFromStorage : defaultSettings;
+    return settings;
+}
+
 export const App: React.FC<AppProps> = React.memo(function App({ api, d2, instance }) {
     const [loading, setLoading] = useState(true);
     const [appContext, setAppContext] = useState<AppContextState | null>(null);
@@ -28,9 +36,12 @@ export const App: React.FC<AppProps> = React.memo(function App({ api, d2, instan
     useEffect(() => {
         async function setup() {
             const isDev = process.env.NODE_ENV === "development";
-            const compositionRoot = getCompositionRoot(api, instance);
+            const defaultSettings = await fetch("default-settings.json").then<Settings>(res => res.json());
+            const storageName = (process.env.REACT_APP_STORAGE as StorageName) || "datastore";
+            const compositionRoot = getCompositionRoot(api, instance, storageName);
             const currentUser = (await compositionRoot.users.getCurrent.execute().runAsync()).data;
-            const settings = (await compositionRoot.settings.get.execute().runAsync()).data;
+            const settingsFromStorage = (await compositionRoot.settings.get.execute().runAsync()).data;
+            const settings = getSettings(settingsFromStorage, defaultSettings);
             if (!currentUser) throw new Error("User not logged in");
 
             setAppContext({ api, currentUser, compositionRoot, isDev, settings, setAppContext });

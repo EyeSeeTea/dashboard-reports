@@ -6,6 +6,7 @@ import { getMockApi } from "../types/d2-api";
 import { AppContext, AppContextState } from "../webapp/contexts/app-context";
 import { Instance } from "../data/entities/Instance";
 import { User } from "../domain/entities/User";
+import { StorageName } from "../domain/entities/Settings";
 
 export function getTestUser(): User {
     return new User({
@@ -34,7 +35,7 @@ export function getTestContext() {
         d2: getTestD2(),
         currentUser: getTestUser(),
         config: getTestConfig(),
-        compositionRoot: getCompositionRoot(api, instance),
+        compositionRoot: getCompositionRoot(api, instance, process.env.REACT_APP_STORAGE as StorageName),
     };
 
     return { api, context };

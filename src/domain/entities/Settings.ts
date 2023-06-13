@@ -1,5 +1,6 @@
 export const SETTINGS_CODE = "DASHBOARD_REPORTS";
 export const DEFAULT_FONT_SIZE = "8";
+export const DATA_STORE_KEY_NAME = "settings";
 
 type Base64String = string;
 
@@ -16,3 +17,5 @@ export interface Settings {
     showFeedback: boolean;
     templates: TemplateReport[];
 }
+
+export type StorageName = "constants" | "datastore";

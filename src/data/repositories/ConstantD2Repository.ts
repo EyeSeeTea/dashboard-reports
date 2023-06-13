@@ -5,7 +5,7 @@ import { D2Api } from "../../types/d2-api";
 import { apiToFuture } from "../../utils/futures";
 import { getUid } from "../../utils/uid";
 
-export class SettingsD2Repository implements SettingsRepository {
+export class ConstantD2Repository implements SettingsRepository {
     constructor(private api: D2Api) {}
 
     public get(): FutureData<Settings> {
@@ -35,7 +35,7 @@ export class SettingsD2Repository implements SettingsRepository {
                       }
             ) as Settings;
             const settings: Settings = {
-                id: constant ? constant.id : getUid("settings"),
+                id: constant?.id || "",
                 fontSize: descriptionJson.fontSize,
                 templates: descriptionJson.templates,
                 showFeedback: descriptionJson.showFeedback,
@@ -49,7 +49,7 @@ export class SettingsD2Repository implements SettingsRepository {
             this.api.metadata.post({
                 constants: [
                     {
-                        id: settings.id,
+                        id: settings.id ? settings.id : getUid("settings"),
                         code: SETTINGS_CODE,
                         name: SETTINGS_CODE,
                         description: JSON.stringify(
@@ -65,8 +65,6 @@ export class SettingsD2Repository implements SettingsRepository {
                     },
                 ],
             })
-        ).map(() => {
-            return settings;
-        });
+        ).map(() => settings);
     }
 }

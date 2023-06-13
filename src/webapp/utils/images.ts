@@ -44,7 +44,7 @@ function getCanvasInformation(dashboardItem: DocxItem, canvas: HTMLCanvasElement
         ...dashboardItem,
         base64: canvas.toDataURL(),
         width: dashboardItem.width ? dashboardItem.width : canvas.width,
-        height: dashboardItem.height ? dashboardItem.height : canvas.width,
+        height: dashboardItem.height ? dashboardItem.height : canvas.height,
     };
 }
 

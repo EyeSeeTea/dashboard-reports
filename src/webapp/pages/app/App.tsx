@@ -10,6 +10,7 @@ import { getCompositionRoot } from "../../../CompositionRoot";
 import { Instance } from "../../../data/entities/Instance";
 import { Settings, StorageName } from "../../../domain/entities/Settings";
 import { D2Api } from "../../../types/d2-api";
+import { Maybe } from "../../../types/utils";
 import { AppContext, AppContextState } from "../../contexts/app-context";
 import { Router } from "../Router";
 import "./App.css";
@@ -22,7 +23,7 @@ export interface AppProps {
     instance: Instance;
 }
 
-function getSettings(settingsFromStorage: Settings | undefined, defaultSettings: Settings): Settings {
+function getSettings(settingsFromStorage: Maybe<Settings>, defaultSettings: Maybe<Settings>): Maybe<Settings> {
     if (!settingsFromStorage) throw new Error("Cannot load settings");
     const hasTemplates = settingsFromStorage ? settingsFromStorage.templates.length > 0 : false;
     const settings = hasTemplates ? settingsFromStorage : defaultSettings;
@@ -36,7 +37,7 @@ export const App: React.FC<AppProps> = React.memo(function App({ api, d2, instan
     useEffect(() => {
         async function setup() {
             const isDev = process.env.NODE_ENV === "development";
-            const defaultSettings = await fetch("default-settings.json").then<Settings>(res => res.json());
+            const defaultSettings = await fetch("default-settings.json").then<Maybe<Settings>>(res => res.json());
             const storageName = (process.env.REACT_APP_STORAGE as StorageName) || "datastore";
             const compositionRoot = getCompositionRoot(api, instance, storageName);
             const currentUser = (await compositionRoot.users.getCurrent.execute().runAsync()).data;

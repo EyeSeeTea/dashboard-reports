@@ -1,11 +1,12 @@
 import { FutureData } from "../../domain/entities/Future";
-import { DEFAULT_FONT_SIZE, Settings, SETTINGS_CODE } from "../../domain/entities/Settings";
+import { getDefaultValues, Settings, SETTINGS_CODE } from "../../domain/entities/Settings";
 import { SettingsRepository } from "../../domain/repositories/SettingsRepository";
 import { D2Api } from "../../types/d2-api";
 import { apiToFuture } from "../../utils/futures";
 import { getUid } from "../../utils/uid";
+import { runMetadata } from "../response";
 
-export class ConstantD2Repository implements SettingsRepository {
+export class SettingsD2ConstantRepository implements SettingsRepository {
     constructor(private api: D2Api) {}
 
     public get(): FutureData<Settings> {
@@ -25,15 +26,7 @@ export class ConstantD2Repository implements SettingsRepository {
             })
         ).map(d2Response => {
             const constant = d2Response.objects[0];
-            const descriptionJson = (
-                constant
-                    ? JSON.parse(constant.description)
-                    : {
-                          fontSize: DEFAULT_FONT_SIZE,
-                          templates: [],
-                          showFeedback: false,
-                      }
-            ) as Settings;
+            const descriptionJson = (constant ? JSON.parse(constant.description) : getDefaultValues()) as Settings;
             const settings: Settings = {
                 id: constant?.id || "",
                 fontSize: descriptionJson.fontSize,
@@ -44,8 +37,8 @@ export class ConstantD2Repository implements SettingsRepository {
         });
     }
 
-    public save(settings: Settings): FutureData<Settings> {
-        return apiToFuture(
+    public save(settings: Settings): FutureData<void> {
+        return runMetadata(
             this.api.metadata.post({
                 constants: [
                     {
@@ -65,6 +58,6 @@ export class ConstantD2Repository implements SettingsRepository {
                     },
                 ],
             })
-        ).map(() => settings);
+        );
     }
 }

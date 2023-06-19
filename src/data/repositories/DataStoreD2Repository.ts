@@ -1,5 +1,5 @@
 import { FutureData } from "../../domain/entities/Future";
-import { DATA_STORE_KEY_NAME, DEFAULT_FONT_SIZE, Settings, SETTINGS_CODE } from "../../domain/entities/Settings";
+import { DATA_STORE_KEY_NAME, getDefaultValues, Settings, SETTINGS_CODE } from "../../domain/entities/Settings";
 import { SettingsRepository } from "../../domain/repositories/SettingsRepository";
 import { D2Api } from "../../types/d2-api";
 import { apiToFuture } from "../../utils/futures";
@@ -13,9 +13,7 @@ export class DataStoreD2Repository implements SettingsRepository {
             if (!d2DataStore)
                 return {
                     id: "",
-                    fontSize: DEFAULT_FONT_SIZE,
-                    showFeedback: false,
-                    templates: [],
+                    ...getDefaultValues(),
                 };
 
             return {
@@ -27,16 +25,14 @@ export class DataStoreD2Repository implements SettingsRepository {
         });
     }
 
-    public save(settings: Settings): FutureData<Settings> {
+    public save(settings: Settings): FutureData<void> {
         const dataStore = this.api.dataStore(SETTINGS_CODE);
         return apiToFuture(
-            dataStore
-                .save(DATA_STORE_KEY_NAME, {
-                    fontSize: settings.fontSize,
-                    templates: settings.templates,
-                    showFeedback: settings.showFeedback,
-                })
-                .map(() => settings)
+            dataStore.save(DATA_STORE_KEY_NAME, {
+                fontSize: settings.fontSize,
+                templates: settings.templates,
+                showFeedback: settings.showFeedback,
+            })
         );
     }
 }

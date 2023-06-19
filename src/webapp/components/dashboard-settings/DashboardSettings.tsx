@@ -38,6 +38,7 @@ export const DashboardSettings: React.FC<DashboardSettingsProps> = React.memo(
                         <FormGroup>
                             <TextField
                                 id="fontsize"
+                                type="number"
                                 name="fontSize"
                                 label={i18n.t("Font Size")}
                                 required

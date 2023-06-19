@@ -18,4 +18,12 @@ export interface Settings {
     templates: TemplateReport[];
 }
 
+export function getDefaultValues(): Omit<Settings, "id"> {
+    return {
+        fontSize: DEFAULT_FONT_SIZE,
+        templates: [],
+        showFeedback: false,
+    };
+}
+
 export type StorageName = "constants" | "datastore";

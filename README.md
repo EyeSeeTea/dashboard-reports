@@ -166,3 +166,17 @@ Now copy all files inside the folder. As a final step, please add the word ".min
 ```
 
 Now you can start the server and check if every visualization is working properly.
+
+### Storage
+
+By default the application save its settings in datastore. But you can control this by modifying the env variable **REACT_APP_STORAGE**.
+
+```
+REACT_APP_STORAGE=constants
+```
+
+for datastore
+
+```
+REACT_APP_STORAGE=datastore
+```

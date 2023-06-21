@@ -169,14 +169,4 @@ Now you can start the server and check if every visualization is working properl
 
 ### Storage
 
-By default the application save its settings in datastore. But you can control this by modifying the env variable **REACT_APP_STORAGE**.
-
-```
-REACT_APP_STORAGE=constants
-```
-
-for datastore
-
-```
-REACT_APP_STORAGE=datastore
-```
+Settings can be saved in the data store (default) or as constants. Use the env variable **REACT_APP_STORAGE** to select which one to use (`datastore` or `constants`).

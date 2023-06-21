@@ -9,7 +9,7 @@ export interface AppContextState {
     currentUser: User;
     compositionRoot: CompositionRoot;
     isDev: boolean;
-    settings: Settings | undefined;
+    settings: Settings;
     setAppContext: React.Dispatch<React.SetStateAction<AppContextState | null>>;
 }
 

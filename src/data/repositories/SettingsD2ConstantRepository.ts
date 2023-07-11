@@ -44,7 +44,7 @@ export class SettingsD2ConstantRepository implements SettingsRepository {
                     {
                         id: settings.id ? settings.id : getUid("settings"),
                         code: SETTINGS_CODE,
-                        name: SETTINGS_CODE,
+                        name: "Dashboard Reports Storage",
                         description: JSON.stringify(
                             {
                                 fontSize: settings.fontSize,

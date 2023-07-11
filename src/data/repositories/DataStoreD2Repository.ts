@@ -17,7 +17,7 @@ export class DataStoreD2Repository implements SettingsRepository {
                 };
 
             return {
-                id: d2DataStore.id,
+                id: SETTINGS_CODE,
                 fontSize: d2DataStore.fontSize,
                 showFeedback: d2DataStore.showFeedback,
                 templates: d2DataStore.templates,
@@ -29,6 +29,7 @@ export class DataStoreD2Repository implements SettingsRepository {
         const dataStore = this.api.dataStore(SETTINGS_CODE);
         return apiToFuture(
             dataStore.save(DATA_STORE_KEY_NAME, {
+                id: SETTINGS_CODE,
                 fontSize: settings.fontSize,
                 templates: settings.templates,
                 showFeedback: settings.showFeedback,

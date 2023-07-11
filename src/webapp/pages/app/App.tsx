@@ -43,6 +43,9 @@ export const App: React.FC<AppProps> = React.memo(function App({ api, d2, instan
             const currentUser = (await compositionRoot.users.getCurrent.execute().runAsync()).data;
             const settingsFromStorage = (await compositionRoot.settings.get.execute().runAsync()).data;
             const settings = getSettings(settingsFromStorage, defaultSettings);
+            if (!settings.id) {
+                await compositionRoot.settings.save.execute(settings).runAsync();
+            }
             if (!currentUser) throw new Error("User not logged in");
 
             setAppContext({ api, currentUser, compositionRoot, isDev, settings, setAppContext });

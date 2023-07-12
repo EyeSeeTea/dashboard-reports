@@ -5,7 +5,7 @@ import { SettingsRepository } from "../repositories/SettingsRepository";
 export class SaveSettingsUseCase {
     constructor(private settingsRepository: SettingsRepository) {}
 
-    public execute(settings: Settings): FutureData<Settings> {
+    public execute(settings: Settings): FutureData<void> {
         return this.settingsRepository.save(settings);
     }
 }

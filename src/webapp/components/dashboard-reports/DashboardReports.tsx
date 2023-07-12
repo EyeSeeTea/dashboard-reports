@@ -12,16 +12,20 @@ import { DashboardItem, ReportItem } from "../../../domain/entities/Dashboard";
 import { DashboardFilter, DashboardFilterData } from "../../components/dashboard-filter/DashboardFilter";
 import { DashboardSettings } from "../../components/dashboard-settings/DashboardSettings";
 import i18n from "../../../locales";
-import { Settings } from "../../../domain/entities/Settings";
+import { Settings, TemplateReport } from "../../../domain/entities/Settings";
 import { useDashboard } from "../../hooks/useDashboard";
 import { useSettings } from "../../hooks/useSettings";
 import { useReports } from "../../hooks/useReports";
+import { useAppContext } from "../../contexts/app-context";
 
 export const DashboardReports: React.FC = React.memo(() => {
+    const appContext = useAppContext();
     const snackbar = useSnackbar();
     const loading = useLoading();
+    const settings = appContext.settings;
     const { dashboards } = useDashboard();
-    const { selectedReport, settings, saveSettings, setSelectedReport } = useSettings();
+    const [selectedReport, setSelectedReport] = React.useState<TemplateReport | undefined>(settings?.templates[0]);
+    const { saveSettings } = useSettings(settings?.templates[0]);
     const [dialogState, setDialogState] = React.useState(false);
     const [dashboard, setDashboard] = React.useState<DashboardFilterData>();
     const { generateDocxReport } = useReports({ dashboard, settings });
@@ -43,6 +47,13 @@ export const DashboardReports: React.FC = React.memo(() => {
     const onSubmitSettings = (settings: Settings) => {
         saveSettings(settings);
         setDialogState(false);
+        appContext.setAppContext(prev => {
+            if (!prev) return null;
+            return {
+                ...prev,
+                settings,
+            };
+        });
     };
 
     const onChangeExport = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -131,7 +142,7 @@ export const DashboardReports: React.FC = React.memo(() => {
                 </ContainerVisualizations>
             </ContainerItems>
 
-            {settings && (
+            {settings && dialogState && (
                 <DashboardSettings
                     settings={settings}
                     onSubmitForm={onSubmitSettings}

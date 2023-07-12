@@ -1,11 +1,12 @@
 import { FutureData } from "../../domain/entities/Future";
-import { DEFAULT_FONT_SIZE, Settings, SETTINGS_CODE } from "../../domain/entities/Settings";
+import { getDefaultValues, Settings, SETTINGS_CODE } from "../../domain/entities/Settings";
 import { SettingsRepository } from "../../domain/repositories/SettingsRepository";
 import { D2Api } from "../../types/d2-api";
 import { apiToFuture } from "../../utils/futures";
 import { getUid } from "../../utils/uid";
+import { runMetadata } from "../response";
 
-export class SettingsD2Repository implements SettingsRepository {
+export class SettingsD2ConstantRepository implements SettingsRepository {
     constructor(private api: D2Api) {}
 
     public get(): FutureData<Settings> {
@@ -25,27 +26,30 @@ export class SettingsD2Repository implements SettingsRepository {
             })
         ).map(d2Response => {
             const constant = d2Response.objects[0];
+            const descriptionJson = (constant ? JSON.parse(constant.description) : getDefaultValues()) as Settings;
             const settings: Settings = {
-                id: constant ? constant.id : getUid("settings"),
-                fontSize: constant ? (JSON.parse(constant.description) as Settings).fontSize : DEFAULT_FONT_SIZE,
-                templates: constant ? (JSON.parse(constant.description) as Settings).templates : [],
+                id: constant?.id || "",
+                fontSize: descriptionJson.fontSize,
+                templates: descriptionJson.templates,
+                showFeedback: descriptionJson.showFeedback,
             };
             return settings;
         });
     }
 
-    public save(settings: Settings): FutureData<Settings> {
-        return apiToFuture(
+    public save(settings: Settings): FutureData<void> {
+        return runMetadata(
             this.api.metadata.post({
                 constants: [
                     {
-                        id: settings.id,
+                        id: settings.id ? settings.id : getUid("settings"),
                         code: SETTINGS_CODE,
-                        name: SETTINGS_CODE,
+                        name: "Dashboard Reports Storage",
                         description: JSON.stringify(
                             {
                                 fontSize: settings.fontSize,
                                 templates: settings.templates,
+                                showFeedback: settings.showFeedback,
                             },
                             null,
                             2
@@ -54,8 +58,6 @@ export class SettingsD2Repository implements SettingsRepository {
                     },
                 ],
             })
-        ).map(() => {
-            return settings;
-        });
+        );
     }
 }

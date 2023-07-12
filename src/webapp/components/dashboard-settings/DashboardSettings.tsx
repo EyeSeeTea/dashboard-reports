@@ -5,6 +5,9 @@ import DialogContent from "@material-ui/core/DialogContent";
 import Dialog from "@material-ui/core/Dialog";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
+import Checkbox from "@material-ui/core/Checkbox";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import FormGroup from "@material-ui/core/FormGroup";
 import { Settings } from "../../../domain/entities/Settings";
 import i18n from "../../../locales";
 
@@ -14,11 +17,14 @@ export const DashboardSettings: React.FC<DashboardSettingsProps> = React.memo(
             e.preventDefault();
             const formElements = e.target as typeof e.target & {
                 fontSize: { value: string };
+                showFeedback: { checked: boolean };
             };
+
             const settingsToSave: Settings = {
                 id: settings.id,
                 fontSize: formElements.fontSize.value,
                 templates: settings.templates,
+                showFeedback: formElements.showFeedback.checked,
             };
             onSubmitForm(settingsToSave);
         };
@@ -29,13 +35,27 @@ export const DashboardSettings: React.FC<DashboardSettingsProps> = React.memo(
 
                 <DialogContent>
                     <form id="settingsform" onSubmit={onSubmit}>
-                        <TextField
-                            id="fontsize"
-                            name="fontSize"
-                            label={i18n.t("Font Size")}
-                            required
-                            defaultValue={settings.fontSize}
-                        />
+                        <FormGroup>
+                            <TextField
+                                id="fontsize"
+                                type="number"
+                                name="fontSize"
+                                label={i18n.t("Font Size")}
+                                required
+                                defaultValue={settings.fontSize}
+                            />
+
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        name="showFeedback"
+                                        color="primary"
+                                        defaultChecked={settings.showFeedback}
+                                    />
+                                }
+                                label={i18n.t("Show/Hide Feedback")}
+                            />
+                        </FormGroup>
                     </form>
                 </DialogContent>
 

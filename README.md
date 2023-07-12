@@ -85,3 +85,88 @@ The file `src/contexts/app-context.ts` holds some general context so typical inf
 ### Scripts
 
 Check the example script, entry `"script-example"`in `package.json`->scripts and `src/scripts/example.ts`.
+
+### About Plugins
+
+Right now the application support 5 different plugins:
+
+| Report        | plugin filename |
+| ------------- | --------------- |
+| Pivot Tables  | reporttable.js  |
+| Event Charts  | eventchart.js   |
+| Event Reports | eventreport.js  |
+| Maps          | map.js          |
+| Charts        | chart.js        |
+
+You can see within the **public** folder the following folder structure:
+
+```
+/236
+  reporttable.min.js
+  eventchart.min.js
+  # all the other plugins
+
+/237
+  reporttable.min.js
+  eventchart.min.js
+  # all the other plugins
+
+/238
+  reporttable.min.js
+  eventchart.min.js
+  # all the other plugins
+```
+
+Plugins have different functionality depending on the DHIS2 version, so we first get the version and then load all the scripts from the specific folder.
+
+### Adding a new version
+
+If you want to add a new version the first thing to do is download the .war file from the [releases page](https://releases.dhis2.org/). Pick the version you want.
+
+Now you need to unzip the war file into a folder in your computer
+
+```bash
+$ unzip ./dhis2-stable-2.39.0.war -d ./war-239
+```
+
+Now go into the new folder and find the plugins:
+
+```bash
+$ cd war-239
+$ find | grep '\(eventreport\|reporttable\|chart\|map\)\.js$'
+```
+
+Which returns the path to plugin scripts (not all the versions have the plugins in the same paths):
+
+```
+./dhis-web-event-visualizer/eventchart.js
+./dhis-web-event-reports/eventreport.js
+./dhis-web-maps/map.js
+./dhis-web-interpretation/chart.js
+./dhis-web-interpretation/reporttable.js
+```
+
+Inside **public**, create a new folder with the version (example: `239`) you want to add:
+
+```
+/public
+  /239
+```
+
+Now copy all files inside the folder. As a final step, please add the word ".min" to the every file so prettier does not try to do its magic on them.
+
+```
+/public
+  /239
+    reporttable.min.js
+    eventchart.min.js
+    eventreport.min.js
+    map.min.js
+    chart.min.js
+```
+
+Now you can start the server and check if every visualization is working properly.
+
+### Storage
+
+Settings can be saved in the data store (default) or as constants. Use the env variable **REACT_APP_STORAGE** to select which one to use (`datastore` or `constants`).

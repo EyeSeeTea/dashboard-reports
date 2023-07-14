@@ -1,0 +1,91 @@
+import _ from "lodash";
+import React from "react";
+import ReactMarkdown from "react-markdown";
+import styled from "styled-components";
+
+const components = {
+    blockquote: ({ children, ...props }: any) => (
+        <details>
+            <summary>{props.title ?? "Note"}</summary>
+            {children?.length === 1 && _.isString(children[0]) ? (
+                <ReactMarkdown>{children[0]}</ReactMarkdown>
+            ) : (
+                children
+            )}
+        </details>
+    ),
+    video: (props: any) => <video width="100%" controls {...props}></video>,
+    "video-gif": (props: any) => <video width="100%" autoPlay loop muted playsInline src={props.src}></video>,
+    pdf: (props: any) => <embed width="100%" height="600px" src={props.src} />,
+    //eslint-disable-next-line jsx-a11y/anchor-has-content
+    a: (props: any) => <a target="_blank" {...props} />,
+};
+
+export const SimpleMarkdownViewer: React.FC<{ className?: string; source: string; center?: boolean }> = ({
+    className,
+    source,
+}) => (
+    <ReactMarkdown className={className} components={components}>
+        {source}
+    </ReactMarkdown>
+);
+
+export const MarkdownViewer = styled(SimpleMarkdownViewer)`
+    color: white;
+    padding: 5px 20px 0 20px;
+    text-align-last: ${props => (props.center ? "center" : "unset")};
+    h1 {
+        font-size: 32px;
+        line-height: 47px;
+        font-weight: 300;
+        margin: 0px 0px 30px 0px;
+    }
+    p {
+        font-size: 17px;
+        font-weight: 300;
+        line-height: 28px;
+        text-align: justify;
+    }
+    img {
+        max-width: 100%;
+        border-radius: 1em;
+        user-drag: none;
+    }
+    video {
+        max-width: 100%;
+        user-drag: none;
+    }
+    a {
+        color: white;
+    }
+    details > summary {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        outline: none;
+        list-style: none;
+        list-style-type: none;
+        font-size: 33px;
+        font-weight: 100;
+        text-align: left;
+        user-select: none;
+    }
+    details > summary::-webkit-details-marker {
+        display: none;
+    }
+    details > summary::before {
+        content: url(./img/note.svg);
+        margin-right: 20px;
+        top: 3px;
+        position: relative;
+    }
+    details > summary::after {
+        content: "keyboard_arrow_down";
+        font-size: 35px;
+        margin-left: 10px;
+        font-family: "Material Icons";
+    }
+    details[open] > summary::after {
+        transform: rotate(180deg);
+    }
+`;

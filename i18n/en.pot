@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-06-13T18:46:56.801Z\n"
-"PO-Revision-Date: 2023-06-13T18:46:56.801Z\n"
+"POT-Creation-Date: 2023-07-14T16:28:01.835Z\n"
+"PO-Revision-Date: 2023-07-14T16:28:01.835Z\n"
 
 msgid "Select Dashboard"
 msgstr ""
@@ -48,4 +48,33 @@ msgid "Help"
 msgstr ""
 
 msgid "Templates not found"
+msgstr ""
+
+msgid "Distributed under GNU GLPv3"
+msgstr ""
+
+msgid ""
+"Dashboard reports is a DHIS2 web application to generate word reports from "
+"a DHIS2 dashboard"
+msgstr ""
+
+msgid ""
+"This application has been funded by the Medecins Sans Frontières (MSF). The "
+"application has been developed by [EyeSeeTea SL](http://eyeseetea.com). "
+"Source code, documentation and release notes can be found at the [EyeSeetea "
+"GitHub Project Page](https://github.com/EyeSeeTea/dashboard-reports/)"
+msgstr ""
+
+msgid ""
+"If you wish to contribute to the development of Dashboard reports with new "
+"features, please contact [EyeSeeTea](mailto:hello@eyeseetea.com)."
+msgstr ""
+
+msgid "About Dashboard reports"
+msgstr ""
+
+msgid "Médicos Sin Fronteras"
+msgstr ""
+
+msgid "EyeSeeTea"
 msgstr ""

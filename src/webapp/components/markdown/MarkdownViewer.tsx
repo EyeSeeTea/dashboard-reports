@@ -1,34 +1,11 @@
-import _ from "lodash";
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import styled from "styled-components";
 
-const components = {
-    blockquote: ({ children, ...props }: any) => (
-        <details>
-            <summary>{props.title ?? "Note"}</summary>
-            {children?.length === 1 && _.isString(children[0]) ? (
-                <ReactMarkdown>{children[0]}</ReactMarkdown>
-            ) : (
-                children
-            )}
-        </details>
-    ),
-    video: (props: any) => <video width="100%" controls {...props}></video>,
-    "video-gif": (props: any) => <video width="100%" autoPlay loop muted playsInline src={props.src}></video>,
-    pdf: (props: any) => <embed width="100%" height="600px" src={props.src} />,
-    //eslint-disable-next-line jsx-a11y/anchor-has-content
-    a: (props: any) => <a target="_blank" {...props} />,
-};
-
 export const SimpleMarkdownViewer: React.FC<{ className?: string; source: string; center?: boolean }> = ({
     className,
     source,
-}) => (
-    <ReactMarkdown className={className} components={components}>
-        {source}
-    </ReactMarkdown>
-);
+}) => <ReactMarkdown className={className}>{source}</ReactMarkdown>;
 
 export const MarkdownViewer = styled(SimpleMarkdownViewer)`
     color: white;

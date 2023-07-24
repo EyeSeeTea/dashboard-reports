@@ -101,6 +101,7 @@ export class Dashboard {
                 };
             })
             .uniqBy("reportId")
+            .sortBy(dashboard => dashboard.reportTitle)
             .value();
     }
 

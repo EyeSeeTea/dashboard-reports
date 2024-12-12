@@ -1,36 +1,12 @@
 import _ from "lodash";
-import { Id, Ref } from "./Ref";
+import { Id } from "./Ref";
 
-export type ReportType = "reportTablePlugin" | "chartPlugin" | "mapPlugin" | "eventChartPlugin" | "eventReportPlugin";
-
-export interface ItemRef {
-    dimension: "pe";
-    items: Ref[];
-    filters: Ref[];
-    columns: Ref[];
-}
-
-export interface ReportItem {
-    id: Id;
-    columns?: ItemRef[];
-    el: string;
-    filters?: ItemRef[];
-    mapViews?: MapView[];
-    reportType: ReportType;
-    rows?: ItemRef[];
-}
-
-export type MapView = {
-    columns: ItemRef[];
-    rows: ItemRef[];
-    filters: ItemRef[];
-};
-
-export interface ItemRef {
-    id: "pe";
-    dimension: "pe";
-    items: Ref[];
-}
+export type LegacyReportType =
+    | "reportTablePlugin"
+    | "chartPlugin"
+    | "mapPlugin"
+    | "eventChartPlugin"
+    | "eventReportPlugin";
 
 export interface DashboardData {
     id: Id;
@@ -42,13 +18,12 @@ export interface DashboardItem {
     id: Id;
     type: string;
     reportId: string;
-    reportType: ReportType;
+    legacyReportType: LegacyReportType;
     reportTitle: string;
     elementId: string;
     map: Map;
     visualization: Visualization;
-    eventReport: EventReport;
-    eventChart: EventChart;
+    eventVisualization: Visualization;
     width: number;
     height: number;
 }
@@ -64,16 +39,6 @@ export interface Map {
     name: string;
 }
 
-export interface EventReport {
-    id: Id;
-    name: string;
-}
-
-export interface EventChart {
-    id: Id;
-    name: string;
-}
-
 export class Dashboard {
     public readonly id: Id;
     public readonly name: string;
@@ -84,14 +49,7 @@ export class Dashboard {
         this.name = data.name;
 
         this.dashboardItems = _(data.dashboardItems)
-            .filter(dashboardItem => {
-                return Boolean(
-                    dashboardItem.visualization ||
-                        dashboardItem.map ||
-                        dashboardItem.eventChart ||
-                        dashboardItem.eventReport
-                );
-            })
+            .filter(dashboardItem => this.showInDashboard(dashboardItem))
             .map(dashboardItem => {
                 return {
                     ...this.getReportInformation(dashboardItem),
@@ -105,38 +63,42 @@ export class Dashboard {
             .value();
     }
 
+    private showInDashboard(dashboardItem: DashboardItem): boolean {
+        return Boolean(dashboardItem.visualization || dashboardItem.map || dashboardItem.eventVisualization);
+    }
+
     private getReportInformation(dashboardItem: DashboardItem): DashboardItem {
+        return {
+            ...dashboardItem,
+            reportTitle: this.getItemTitle(dashboardItem),
+            reportId: this.getItemReportId(dashboardItem),
+            legacyReportType: this.getItemLegacyReportType(dashboardItem),
+        };
+    }
+
+    private getItemTitle(dashboardItem: DashboardItem): string {
+        const data = dashboardItem.map ?? dashboardItem.eventVisualization ?? dashboardItem.visualization;
+        return data.name.trim();
+    }
+
+    private getItemReportId(dashboardItem: DashboardItem): string {
+        const data = dashboardItem.map ?? dashboardItem.eventVisualization ?? dashboardItem.visualization;
+        return data.id;
+    }
+
+    private getItemLegacyReportType(dashboardItem: DashboardItem): LegacyReportType {
         if (dashboardItem.map) {
-            return {
-                ...dashboardItem,
-                reportType: "mapPlugin",
-                reportTitle: dashboardItem.map.name.trim(),
-                reportId: dashboardItem.map.id,
-            };
-        } else if (dashboardItem.eventChart) {
-            return {
-                ...dashboardItem,
-                reportType: "eventChartPlugin",
-                reportTitle: dashboardItem.eventChart.name.trim(),
-                reportId: dashboardItem.eventChart.id,
-            };
-        } else if (dashboardItem.eventReport) {
-            return {
-                ...dashboardItem,
-                reportType: "eventReportPlugin",
-                reportTitle: dashboardItem.eventReport.name.trim(),
-                reportId: dashboardItem.eventReport.id,
-            };
-        } else {
-            const isVisualization = dashboardItem.type === "VISUALIZATION";
-            const isPivot = dashboardItem.visualization.type === "PIVOT_TABLE";
-            const reportType = isVisualization && isPivot ? "reportTablePlugin" : "chartPlugin";
-            return {
-                ...dashboardItem,
-                reportType,
-                reportTitle: dashboardItem.visualization.name.trim(),
-                reportId: dashboardItem.visualization.id,
-            };
+            return "mapPlugin";
         }
+        if (dashboardItem.type === "EVENT_CHART") {
+            return "eventChartPlugin";
+        }
+        if (dashboardItem.type === "EVENT_REPORT") {
+            return "eventReportPlugin";
+        }
+        if (dashboardItem.visualization && dashboardItem.visualization.type === "PIVOT_TABLE") {
+            return "reportTablePlugin";
+        }
+        return "chartPlugin";
     }
 }

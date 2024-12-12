@@ -16,6 +16,7 @@ import { Router } from "../Router";
 import "./App.css";
 import muiThemeLegacy from "./themes/dhis2-legacy.theme";
 import { muiTheme } from "./themes/dhis2.theme";
+import _ from "lodash";
 
 export interface AppProps {
     api: D2Api;
@@ -43,12 +44,13 @@ export const App: React.FC<AppProps> = React.memo(function App({ api, d2, instan
             const currentUser = (await compositionRoot.users.getCurrent.execute().runAsync()).data;
             const settingsFromStorage = (await compositionRoot.settings.get.execute().runAsync()).data;
             const settings = getSettings(settingsFromStorage, defaultSettings);
+            const pluginVersion = `${_.get(d2, "system.version.major")}${_.get(d2, "system.version.minor")}`;
             if (!settings.id) {
                 await compositionRoot.settings.save.execute(settings).runAsync();
             }
             if (!currentUser) throw new Error("User not logged in");
 
-            setAppContext({ api, currentUser, compositionRoot, isDev, settings, setAppContext });
+            setAppContext({ api, currentUser, compositionRoot, isDev, settings, setAppContext, pluginVersion });
             setLoading(false);
         }
         setup();

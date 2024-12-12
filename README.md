@@ -88,7 +88,13 @@ Check the example script, entry `"script-example"`in `package.json`->scripts and
 
 ### About Plugins
 
-Right now the application support 5 different plugins:
+From DHIS2 v2.39, a new way to embed visualizations is available, but is not yet widely documented. Some apps expose a `plugin.html` file, which can be included as an iframe, and then initialization and communication is leveraged by `postMessage`.
+Reference implementation can be found in the `PluginContents` component.
+Not all types of visualizations are supported yet with this new approach, so we still support Legacy Plugins for some cases.
+
+#### Legacy Plugins
+
+Right now the application support 5 different legacy plugins:
 
 | Report        | plugin filename |
 | ------------- | --------------- |
@@ -117,9 +123,9 @@ You can see within the **public** folder the following folder structure:
   # all the other plugins
 ```
 
-Plugins have different functionality depending on the DHIS2 version, so we first get the version and then load all the scripts from the specific folder.
+Plugins have different functionality depending on the DHIS2 version, so we first get the version and load the scripts from the corresponding folder.
 
-### Adding a new version
+#### Adding a new Legacy Plugin version
 
 If you want to add a new version the first thing to do is download the .war file from the [releases page](https://releases.dhis2.org/). Pick the version you want.
 

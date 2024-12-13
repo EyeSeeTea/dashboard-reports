@@ -13,9 +13,10 @@ export const LegacyVisualizationContents: React.FunctionComponent<LegacyVisualiz
     const { visualization, dashboardItem } = props;
     const pluginState = useLegacyVisualizationPlugin(dashboardItem, visualization);
     return (
-        <div style={styles.container} id={dashboardItem.elementId} className="legacy-visualization">
+        <>
             {pluginState.type === "loading" && <LinearProgress />}
-        </div>
+            <div style={styles.container} id={dashboardItem.elementId} className="legacy-visualization"></div>
+        </>
     );
 });
 

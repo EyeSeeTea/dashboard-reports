@@ -18,12 +18,13 @@ export interface DashboardItem {
     id: Id;
     type: string;
     reportId: string;
+    useLegacy: boolean;
     legacyReportType: LegacyReportType;
     reportTitle: string;
     elementId: string;
-    map: Map;
-    visualization: Visualization;
-    eventVisualization: Visualization;
+    map?: Map;
+    visualization?: Visualization;
+    eventVisualization?: Visualization;
     width: number;
     height: number;
 }
@@ -72,18 +73,39 @@ export class Dashboard {
             ...dashboardItem,
             reportTitle: this.getItemTitle(dashboardItem),
             reportId: this.getItemReportId(dashboardItem),
+            useLegacy: this.getItemShouldUseLegacy(dashboardItem),
             legacyReportType: this.getItemLegacyReportType(dashboardItem),
         };
     }
 
-    private getItemTitle(dashboardItem: DashboardItem): string {
+    /**
+     * @returns true when Legacy Plugin is preferred.
+     */
+    private getItemShouldUseLegacy(dashboardItem: DashboardItem): boolean {
+        return (
+            // EVENT_CHART is not working with the new dhis-data-visualizer iframe
+            dashboardItem.type === "EVENT_CHART" ||
+            // EVENT_REPORT only works with the line-listing iframe
+            (dashboardItem.type === "EVENT_REPORT" && dashboardItem.eventVisualization?.type !== "LINE_LIST") ||
+            // VISUALIZATION type PIVOT_TABLE: dhis-data-visualizer iframe modifies dom on scroll. Prefer legacy for easy image export
+            (dashboardItem.type === "VISUALIZATION" && dashboardItem.visualization?.type === "PIVOT_TABLE")
+        );
+    }
+
+    private getItemData(dashboardItem: DashboardItem) {
         const data = dashboardItem.map ?? dashboardItem.eventVisualization ?? dashboardItem.visualization;
-        return data.name.trim();
+        if (!data) {
+            throw new Error("Missing property - one of: map, eventVisualization, visualization");
+        }
+        return data;
+    }
+
+    private getItemTitle(dashboardItem: DashboardItem): string {
+        return this.getItemData(dashboardItem).name.trim();
     }
 
     private getItemReportId(dashboardItem: DashboardItem): string {
-        const data = dashboardItem.map ?? dashboardItem.eventVisualization ?? dashboardItem.visualization;
-        return data.id;
+        return this.getItemData(dashboardItem).id;
     }
 
     private getItemLegacyReportType(dashboardItem: DashboardItem): LegacyReportType {

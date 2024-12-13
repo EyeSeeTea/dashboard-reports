@@ -6,27 +6,12 @@ import { useVisualizationLoader } from "../../hooks/useVisualizationLoader";
 import { DashboardItem } from "../../../domain/entities/Dashboard";
 import { ReportPeriod } from "../../../domain/entities/DateMonth";
 import { LegacyVisualizationContents } from "./LegacyVisualizationContents";
-import { PluginVisualization } from "../../../domain/entities/PluginVisualization";
+import { useAppContext } from "../../contexts/app-context";
 
 export interface VisualizationProps {
     dashboardItem: DashboardItem;
     orgUnit?: Ref;
     period: ReportPeriod;
-}
-
-/**
- * Determines which kind of plugin to use.
- * EVENT_CHART is not working with the new dhis-data-visualizer iframe
- * EVENT_REPORT only works with the line-listing iframe
- * VISUALIZATION type PIVOT_TABLE dhis-data-visualizer modifies dom on scroll so image export does not work
- */
-function showLegacyVisualization(dashboardItem: DashboardItem, visualization: PluginVisualization): boolean {
-    // TODO: move this to domain - check if possible
-    return (
-        dashboardItem.type === "EVENT_CHART" ||
-        (dashboardItem.type === "EVENT_REPORT" && visualization.type !== "LINE_LIST") ||
-        (dashboardItem.type === "VISUALIZATION" && visualization.type === "PIVOT_TABLE")
-    );
 }
 
 export const Visualization: React.FC<VisualizationProps> = React.memo(props => {
@@ -37,9 +22,11 @@ export const Visualization: React.FC<VisualizationProps> = React.memo(props => {
         orgUnitId: orgUnit?.id,
         period,
     });
+    const onlyLegacySupported = useOnlyLegacySupported();
+
     switch (visualizationLoader.type) {
         case "loaded":
-            return showLegacyVisualization(dashboardItem, visualizationLoader.value) ? (
+            return onlyLegacySupported || dashboardItem.useLegacy ? (
                 <LegacyVisualizationContents visualization={visualizationLoader.value} dashboardItem={dashboardItem} />
             ) : (
                 <VisualizationContents visualization={visualizationLoader.value} dashboardItem={dashboardItem} />
@@ -50,3 +37,9 @@ export const Visualization: React.FC<VisualizationProps> = React.memo(props => {
             return <div>{visualizationLoader.message}</div>;
     }
 });
+
+function useOnlyLegacySupported(): boolean {
+    const IFRAME_PLUGIN_SUPPORT_MIN_VERSION = 239;
+    const { pluginVersion } = useAppContext();
+    return Number(pluginVersion) < IFRAME_PLUGIN_SUPPORT_MIN_VERSION;
+}

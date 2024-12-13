@@ -83,13 +83,10 @@ export function getImagesFromDom(dashboardItems: DashboardItem[]) {
                     newEl.width = canvasEl.width;
                     newEl.height = canvasEl.height;
                 }
-            } else if (["CHART", "EVENT_CHART", "VISUALIZATION"].includes(dashboardItem.type)) {
-                const errorDiv = root.querySelector('[data-test="start-screen-error-container"]');
-                newEl.domEl = errorDiv ?? (root.querySelector("svg") as SVGElement);
             } else if (
                 dashboardItem.type === "REPORT" ||
                 dashboardItem.type === "EVENT_REPORT" ||
-                dashboardItem.visualization.type === "PIVOT_TABLE"
+                dashboardItem.visualization?.type === "PIVOT_TABLE"
             ) {
                 newEl.domEl = root.querySelector("table") as HTMLTableElement;
                 const tableRects = newEl.domEl?.getClientRects();
@@ -97,6 +94,9 @@ export function getImagesFromDom(dashboardItems: DashboardItem[]) {
                     newEl.width = tableRects[0].width;
                     newEl.height = tableRects[0].height;
                 }
+            } else if (["CHART", "EVENT_CHART", "VISUALIZATION"].includes(dashboardItem.type)) {
+                const errorDiv = root.querySelector('[data-test="start-screen-error-container"]');
+                newEl.domEl = errorDiv ?? (root.querySelector("svg") as SVGElement);
             }
             return newEl;
         })

@@ -6,12 +6,12 @@ import { PluginVisualization } from "../../../domain/entities/PluginVisualizatio
 import { useVisualizationIframeUrl } from "../../hooks/useDhis2Url";
 import { DashboardItem } from "../../../domain/entities/Dashboard";
 
-export interface VisualizationProps {
+export interface VisualizationContentProps {
     dashboardItem: DashboardItem;
     visualization: PluginVisualization;
 }
 
-export const VisualizationContents: React.FunctionComponent<VisualizationProps> = React.memo(props => {
+export const VisualizationContents: React.FunctionComponent<VisualizationContentProps> = React.memo(props => {
     const { dashboardItem, visualization } = props;
     const iframeRef = React.useRef<HTMLIFrameElement>(null);
     const dataVisualizerPluginUrl = useVisualizationIframeUrl(visualization);

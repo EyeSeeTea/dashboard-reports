@@ -7,13 +7,14 @@ import { FutureData } from "../../domain/entities/Future";
 import { apiToFuture } from "../../utils/futures";
 import { DashboardItem } from "../../domain/entities/Dashboard";
 import { generatePeriods, PeriodItem, ReportPeriod } from "../../domain/entities/DateMonth";
+import { Maybe } from "../../types/utils";
 
 export class PluginVisualizationD2Repository implements PluginVisualizationRepository {
     constructor(private api: D2Api) {}
 
     get(options: {
         dashboardItem: DashboardItem;
-        orgUnitId?: Id;
+        orgUnitId: Maybe<Id>;
         period: ReportPeriod;
     }): FutureData<PluginVisualization> {
         const params = processFieldsFilterParams({ fields: visualizationFields, filter: {} });
@@ -35,8 +36,7 @@ export class PluginVisualizationD2Repository implements PluginVisualizationRepos
         const itemsPeriod = generatePeriods(reportPeriod);
         if (itemsPeriod.length === 0) {
             return item;
-        }
-        if (isD2Map(item)) {
+        } else if (isD2Map(item)) {
             return {
                 ...item,
                 mapViews: item.mapViews.map((mapView: MapView) => ({
@@ -44,11 +44,12 @@ export class PluginVisualizationD2Repository implements PluginVisualizationRepos
                     ...this.applyPeriodToDimensionAttrs(mapView as WithDimensionAttributes, itemsPeriod),
                 })),
             } as D2MapVisualization;
+        } else {
+            return {
+                ...item,
+                ...this.applyPeriodToDimensionAttrs(item as WithDimensionAttributes, itemsPeriod),
+            };
         }
-        return {
-            ...item,
-            ...this.applyPeriodToDimensionAttrs(item as WithDimensionAttributes, itemsPeriod),
-        };
     }
 
     private applyOrgUnitFilters(item: D2PluginVisualization, _orgUnit: string) {

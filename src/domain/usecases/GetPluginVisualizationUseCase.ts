@@ -1,3 +1,4 @@
+import { Maybe } from "../../types/utils";
 import { DashboardItem } from "../entities/Dashboard";
 import { ReportPeriod } from "../entities/DateMonth";
 import { FutureData } from "../entities/Future";
@@ -10,7 +11,7 @@ export class GetPluginVisualizationUseCase {
 
     execute(options: {
         dashboardItem: DashboardItem;
-        orgUnitId?: Id;
+        orgUnitId: Maybe<Id>;
         period: ReportPeriod;
     }): FutureData<PluginVisualization> {
         return this.visualizationRepository.get(options);

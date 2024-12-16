@@ -111,16 +111,14 @@ export class Dashboard {
     private getItemLegacyReportType(dashboardItem: DashboardItem): LegacyReportType {
         if (dashboardItem.map) {
             return "mapPlugin";
-        }
-        if (dashboardItem.type === "EVENT_CHART") {
+        } else if (dashboardItem.type === "EVENT_CHART") {
             return "eventChartPlugin";
-        }
-        if (dashboardItem.type === "EVENT_REPORT") {
+        } else if (dashboardItem.type === "EVENT_REPORT") {
             return "eventReportPlugin";
-        }
-        if (dashboardItem.visualization && dashboardItem.visualization.type === "PIVOT_TABLE") {
+        } else if (dashboardItem.visualization && dashboardItem.visualization.type === "PIVOT_TABLE") {
             return "reportTablePlugin";
+        } else {
+            return "chartPlugin";
         }
-        return "chartPlugin";
     }
 }

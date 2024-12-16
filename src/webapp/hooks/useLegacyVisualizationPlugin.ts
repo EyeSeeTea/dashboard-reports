@@ -5,6 +5,7 @@ import { useSnackbar } from "@eyeseetea/d2-ui-components";
 import { useDhis2Url, useLegacyVisualizationScriptUrl } from "./useDhis2Url";
 import { PluginVisualization } from "../../domain/entities/PluginVisualization";
 import { LoaderState } from "./useLoader";
+import i18n from "../../locales";
 
 export function useLegacyVisualizationPlugin(dashboardItem: DashboardItem, visualization: PluginVisualization) {
     const snackbar = useSnackbar();
@@ -16,7 +17,11 @@ export function useLegacyVisualizationPlugin(dashboardItem: DashboardItem, visua
             .then(() => {
                 const plugin = window[dashboardItem.legacyReportType];
                 if (!plugin) {
-                    throw new Error(`Legacy plugin "${dashboardItem.legacyReportType}" not found`);
+                    throw new Error(
+                        i18n.t(`Legacy plugin "{{legacyReportType}}" not found`, {
+                            legacyReportType: dashboardItem.legacyReportType,
+                        })
+                    );
                 }
                 plugin.url = dhisUrl;
                 plugin.loadingIndicator = true;

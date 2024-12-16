@@ -3,10 +3,11 @@ import { Maybe } from "../../types/utils";
 import { useLoader } from "./useLoader";
 import { DashboardItem } from "../../domain/entities/Dashboard";
 import { ReportPeriod } from "../../domain/entities/DateMonth";
+import { Id } from "../../domain/entities/Ref";
 
 interface UseVisualizationLoaderArgs {
     dashboardItem: DashboardItem;
-    orgUnitId: Maybe<string>;
+    orgUnitId: Maybe<Id>;
     period: ReportPeriod;
 }
 

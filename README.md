@@ -88,9 +88,14 @@ Check the example script, entry `"script-example"`in `package.json`->scripts and
 
 ### About Plugins
 
-From DHIS2 v2.39, a new way to embed visualizations is available, but is not yet widely documented. Some apps expose a `plugin.html` file, which can be included as an iframe, and then initialization and communication is leveraged by `postMessage`.
-Reference implementation can be found in the `PluginContents` component.
-Not all types of visualizations are supported yet with this new approach, so we still support Legacy Plugins for some cases.
+There are two ways to include visualizations:
+
+-   Using iframes: Supported by newer features of the app platform
+-   Using JavaScript plugins (Legacy): Maintained for backward compatibility
+
+The reference implementation for iframes can be found in the `VisualizationContents` component. In the future, the [App Runtime Plugin component](https://developers.dhis2.org/docs/app-runtime/components/plugin/) may replace this component.
+
+Legacy visualizations are implemented in the `LegacyVisualizationContents` component. This approach is retained for backwards compatibility and to support visualizations not yet compatible with the iframe plugin architecture.
 
 #### Legacy Plugins
 

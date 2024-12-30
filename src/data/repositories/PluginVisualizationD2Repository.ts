@@ -14,7 +14,7 @@ export class PluginVisualizationD2Repository implements PluginVisualizationRepos
 
     get(options: {
         dashboardItem: DashboardItem;
-        orgUnitId: Maybe<Id>;
+        orgUnitIds: Maybe<Id[]>;
         period: ReportPeriod;
     }): FutureData<PluginVisualization> {
         const params = processFieldsFilterParams({ fields: visualizationFields, filter: {} });
@@ -24,7 +24,7 @@ export class PluginVisualizationD2Repository implements PluginVisualizationRepos
         );
         return res$
             .map(res => this.applyPeriodFilters(res, options.period))
-            .map(res => (options.orgUnitId ? this.applyOrgUnitFilters(res, options.orgUnitId) : res))
+            .map(res => (options.orgUnitIds ? this.applyOrgUnitFilters(res, options.orgUnitIds) : res))
             .map(res => (isD2Map(res) ? { ...res, type: "MAP" } : res));
     }
 
@@ -52,11 +52,6 @@ export class PluginVisualizationD2Repository implements PluginVisualizationRepos
         }
     }
 
-    private applyOrgUnitFilters(item: D2PluginVisualization, _orgUnit: string) {
-        // TODO: filter by org unit
-        return item;
-    }
-
     private applyPeriodToDimensionAttrs(obj: WithDimensionAttributes, period: PeriodItem[]) {
         return {
             rows: this.applyPeriodToDimensions(obj.rows, period),
@@ -69,6 +64,39 @@ export class PluginVisualizationD2Repository implements PluginVisualizationRepos
         return dimensions.map(dimension => ({
             ...dimension,
             items: dimension.dimension === "pe" ? period : dimension.items,
+        }));
+    }
+
+    private applyOrgUnitFilters(item: D2PluginVisualization, orgUnitIds: Id[]) {
+        if (isD2Map(item)) {
+            return {
+                ...item,
+                mapViews: item.mapViews.map((mapView: MapView) => ({
+                    ...mapView,
+                    ...this.applyOrgUnitToDimensionAttrs(mapView as WithDimensionAttributes, orgUnitIds),
+                })),
+            } as D2MapVisualization;
+        } else {
+            return {
+                ...item,
+                ...this.applyOrgUnitToDimensionAttrs(item as WithDimensionAttributes, orgUnitIds),
+            };
+        }
+    }
+
+    private applyOrgUnitToDimensionAttrs(obj: WithDimensionAttributes, orgUnitIds: Id[]) {
+        return {
+            rows: this.applyOrgUnitToDimensions(obj.rows, orgUnitIds),
+            columns: this.applyOrgUnitToDimensions(obj.columns, orgUnitIds),
+            filters: this.applyOrgUnitToDimensions(obj.filters, orgUnitIds),
+        };
+    }
+
+    private applyOrgUnitToDimensions(dimensions: D2Dimension[], orgUnitIds: Id[]) {
+        const newItems = orgUnitIds.map(id => ({ id, dimensionItemType: "ORGANISATION_UNIT" }));
+        return dimensions.map(dimension => ({
+            ...dimension,
+            items: dimension.dimension === "ou" ? newItems : dimension.items,
         }));
     }
 }

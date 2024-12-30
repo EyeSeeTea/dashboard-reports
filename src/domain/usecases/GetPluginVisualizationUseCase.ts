@@ -11,7 +11,7 @@ export class GetPluginVisualizationUseCase {
 
     execute(options: {
         dashboardItem: DashboardItem;
-        orgUnitId: Maybe<Id>;
+        orgUnitIds: Maybe<Id[]>;
         period: ReportPeriod;
     }): FutureData<PluginVisualization> {
         return this.visualizationRepository.get(options);

@@ -10,13 +10,13 @@
         "url": "git+https://github.com/eyeseetea/dashboard-reports.git"
     },
     "dependencies": {
-        "@dhis2/app-runtime": "2.8.0",
+        "@dhis2/app-runtime": "3.10.4",
         "@dhis2/d2-i18n": "1.1.0",
         "@dhis2/d2-i18n-extract": "1.0.8",
         "@dhis2/d2-i18n-generate": "1.2.0",
-        "@dhis2/ui": "6.12.0",
-        "@eyeseetea/d2-api": "1.13.1",
-        "@eyeseetea/d2-ui-components": "2.6.11",
+        "@dhis2/ui": "6.15.2",
+        "@eyeseetea/d2-api": "1.16.1",
+        "@eyeseetea/d2-ui-components": "2.9.0",
         "@eyeseetea/feedback-component": "0.0.3",
         "@krakenjs/post-robot": "^11.0.0",
         "@material-ui/core": "4.12.4",

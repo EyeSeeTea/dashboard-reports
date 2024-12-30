@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2024-12-16T17:57:18.316Z\n"
-"PO-Revision-Date: 2024-12-16T17:57:18.316Z\n"
+"POT-Creation-Date: 2024-12-30T12:25:50.318Z\n"
+"PO-Revision-Date: 2024-12-30T12:25:50.318Z\n"
 
 msgid "Select Dashboard"
 msgstr ""
@@ -39,6 +39,24 @@ msgid "Save"
 msgstr ""
 
 msgid "Close"
+msgstr ""
+
+msgid "Loading..."
+msgstr ""
+
+msgid "Error"
+msgstr ""
+
+msgid "Select Organization Units"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Select"
+msgstr ""
+
+msgid "Clear"
 msgstr ""
 
 msgid "Back"

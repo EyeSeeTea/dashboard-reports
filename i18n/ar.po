@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2024-12-16T17:57:18.316Z\n"
+"POT-Creation-Date: 2024-12-31T16:17:51.096Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,19 +26,16 @@ msgstr ""
 msgid "Export to Word"
 msgstr ""
 
-msgid "App Settings"
-msgstr ""
-
 msgid "Font Size"
 msgstr ""
 
 msgid "Show/Hide Feedback"
 msgstr ""
 
-msgid "Save"
+msgid "Cancel"
 msgstr ""
 
-msgid "Close"
+msgid "Save"
 msgstr ""
 
 msgid "Back"
@@ -51,6 +48,9 @@ msgid "Legacy plugin \"{{legacyReportType}}\" not found"
 msgstr ""
 
 msgid "Templates not found"
+msgstr ""
+
+msgid "Settings saved"
 msgstr ""
 
 msgid "Distributed under GNU GLPv3"
@@ -80,4 +80,7 @@ msgid "Médicos Sin Fronteras"
 msgstr ""
 
 msgid "EyeSeeTea"
+msgstr ""
+
+msgid "App Settings"
 msgstr ""

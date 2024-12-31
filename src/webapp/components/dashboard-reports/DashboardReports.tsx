@@ -10,24 +10,22 @@ import Typography from "@material-ui/core/Typography";
 import { useSnackbar, useLoading } from "@eyeseetea/d2-ui-components";
 import { DashboardItem } from "../../../domain/entities/Dashboard";
 import { DashboardFilter, DashboardFilterData } from "../../components/dashboard-filter/DashboardFilter";
-import { DashboardSettings } from "../../components/dashboard-settings/DashboardSettings";
 import i18n from "../../../locales";
-import { Settings, TemplateReport } from "../../../domain/entities/Settings";
+import { TemplateReport } from "../../../domain/entities/Settings";
 import { useDashboard } from "../../hooks/useDashboard";
-import { useSettings } from "../../hooks/useSettings";
 import { useGenerateDocxReport } from "../../hooks/useGenerateDocxReport";
 import { useAppContext } from "../../contexts/app-context";
 import { Visualization } from "../visualization/Visualization";
+import { Link } from "react-router-dom";
 
 export const DashboardReports: React.FC = React.memo(() => {
     const appContext = useAppContext();
     const snackbar = useSnackbar();
     const loading = useLoading();
     const settings = appContext.settings;
+    const isAdmin = appContext.currentUser.isAdmin();
     const { dashboards } = useDashboard();
     const [selectedReport, setSelectedReport] = React.useState<TemplateReport | undefined>(settings?.templates[0]);
-    const { saveSettings } = useSettings(settings?.templates[0]);
-    const [dialogState, setDialogState] = React.useState(false);
     const [dashboard, setDashboard] = React.useState<DashboardFilterData>();
     const { generateDocxReport } = useGenerateDocxReport({ dashboard, settings });
 
@@ -35,26 +33,6 @@ export const DashboardReports: React.FC = React.memo(() => {
 
     const onChange = (dashboardFilter: DashboardFilterData) => {
         setDashboard(dashboardFilter);
-    };
-
-    const onSettings = () => {
-        setDialogState(true);
-    };
-
-    const closeDialog = () => {
-        setDialogState(false);
-    };
-
-    const onSubmitSettings = (settings: Settings) => {
-        saveSettings(settings);
-        setDialogState(false);
-        appContext.setAppContext(prev => {
-            if (!prev) return null;
-            return {
-                ...prev,
-                settings,
-            };
-        });
     };
 
     const onChangeExport = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -115,11 +93,15 @@ export const DashboardReports: React.FC = React.memo(() => {
                         </Button>
                     </>
                 )}
-                <IconContainer>
-                    <IconButton onClick={onSettings}>
-                        <SettingsIcon />
-                    </IconButton>
-                </IconContainer>
+                {isAdmin && (
+                    <IconContainer>
+                        <Link to="/settings">
+                            <IconButton>
+                                <SettingsIcon />
+                            </IconButton>
+                        </Link>
+                    </IconContainer>
+                )}
             </DashboardFilter>
 
             <ContainerItems>
@@ -141,15 +123,6 @@ export const DashboardReports: React.FC = React.memo(() => {
                     })}
                 </ContainerVisualizations>
             </ContainerItems>
-
-            {settings && dialogState && (
-                <DashboardSettings
-                    settings={settings}
-                    onSubmitForm={onSubmitSettings}
-                    onDialogClose={closeDialog}
-                    dialogState={dialogState}
-                />
-            )}
         </>
     );
 });

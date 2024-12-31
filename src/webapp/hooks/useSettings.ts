@@ -21,6 +21,9 @@ export function useSettings(template: TemplateReport | undefined) {
             compositionRoot.settings.save.execute(settings).run(
                 () => {
                     loading.hide();
+                    snackbar.openSnackbar("success", i18n.t("Settings saved"), {
+                        autoHideDuration: 3000,
+                    });
                 },
                 err => {
                     snackbar.openSnackbar("error", err);

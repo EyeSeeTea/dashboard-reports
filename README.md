@@ -181,3 +181,7 @@ Now you can start the server and check if every visualization is working properl
 ### Storage
 
 Settings can be saved in the data store (default) or as constants. Use the env variable **REACT_APP_STORAGE** to select which one to use (`datastore` or `constants`).
+
+### Custom Header and Footer
+
+The header and footer can be configured in `src/app-config.ts`. They can be disabled by setting their values to `false`.

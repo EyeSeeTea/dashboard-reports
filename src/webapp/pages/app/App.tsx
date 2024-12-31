@@ -17,6 +17,8 @@ import "./App.css";
 import muiThemeLegacy from "./themes/dhis2-legacy.theme";
 import { muiTheme } from "./themes/dhis2.theme";
 import _ from "lodash";
+import { CustomHeader } from "../../components/custom-header/CustomHeader";
+import { CustomFooter } from "../../components/custom-footer/CustomFooter";
 
 export interface AppProps {
     api: D2Api;
@@ -63,8 +65,8 @@ export const App: React.FC<AppProps> = React.memo(function App({ api, d2, instan
             <OldMuiThemeProvider muiTheme={muiThemeLegacy}>
                 <LoadingProvider>
                     <SnackbarProvider>
-                        <HeaderBar appName="Dashboard Reports" />
-
+                        {appConfig.header && <CustomHeader {...appConfig.header} />}
+                        {appContext?.currentUser.isAdmin() ? <HeaderBar appName="Dashboard Reports" /> : null}
                         {appConfig.feedback && appContext && appContext.settings?.showFeedback && (
                             <Feedback options={appConfig.feedback} username={appContext.currentUser.username} />
                         )}
@@ -74,6 +76,7 @@ export const App: React.FC<AppProps> = React.memo(function App({ api, d2, instan
                                 <Router />
                             </AppContext.Provider>
                         </div>
+                        {appConfig.footer && <CustomFooter {...appConfig.footer} />}
                     </SnackbarProvider>
                 </LoadingProvider>
             </OldMuiThemeProvider>

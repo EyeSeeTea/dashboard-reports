@@ -19,19 +19,6 @@ export const appConfig: AppConfig = {
     },
     header: false,
     footer: false,
-    // header: {
-    //     title: "Dashboard Reports - Custom Header Title",
-    //     background: "rgba(19,52,59,1)",
-    //     color: "white",
-    // },
-    // footer: {
-    //     text: `Dashboard Reports - Custom Footer.
-    //     Multi-line text is allowed.
-    //     TBD: More customization options.
-    //     `,
-    //     background: "linear-gradient(90deg, rgba(31,41,30,1) 0%, rgba(20,50,28,1) 50%, rgba(31,41,30,1) 100%)",
-    //     color: "white",
-    // },
 };
 
 export interface HeaderOptions {

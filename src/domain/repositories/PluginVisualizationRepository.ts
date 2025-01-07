@@ -8,7 +8,7 @@ import { Maybe } from "../../types/utils";
 export interface PluginVisualizationRepository {
     get(options: {
         dashboardItem: DashboardItem;
-        orgUnitId: Maybe<Id>;
+        orgUnitIds: Maybe<Id[]>;
         period: ReportPeriod;
     }): FutureData<PluginVisualization>;
 }

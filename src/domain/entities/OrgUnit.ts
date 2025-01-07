@@ -7,7 +7,6 @@ export interface OrgUnit {
     id: Id;
     path: OrgUnitPath;
     name: string;
-    displayName: string;
     level: number;
 }
 

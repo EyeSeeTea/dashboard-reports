@@ -83,7 +83,7 @@ export const DashboardReports: React.FC = React.memo(() => {
         dashboardItems = currentDashboard.dashboardItems;
     }
 
-    const orgUnitIds = dashboard?.orgUnits?.length ? dashboard.orgUnits.map(getIdFromPath) : undefined;
+    const orgUnitIds = dashboard?.orgUnitPaths?.length ? dashboard.orgUnitPaths.map(getIdFromPath) : undefined;
 
     return (
         <>

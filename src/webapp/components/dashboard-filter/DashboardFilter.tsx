@@ -17,7 +17,7 @@ import { OrgUnitPath } from "../../../domain/entities/OrgUnit";
 export type DashboardFilterData = {
     dashboard?: Dashboard;
     dateMonth: ReportPeriod;
-    orgUnits: Maybe<OrgUnitPath[]>;
+    orgUnitPaths: Maybe<OrgUnitPath[]>;
 };
 
 function formatDate(value: string) {
@@ -53,13 +53,13 @@ export const DashboardFilter: React.FC<DashboardFilterProps> = React.memo(({ chi
     const [dashboard, setDashboard] = React.useState<string>("");
     const [month, setMonth] = React.useState<string | null>(null);
     const [lastMonths, setLastMonths] = React.useState<boolean>(false);
-    const [orgUnits, setOrgUnits] = React.useState<Maybe<OrgUnitPath[]>>();
+    const [orgUnitPaths, setOrgUnitPaths] = React.useState<Maybe<OrgUnitPath[]>>();
 
     const getCurrentFilter = (): DashboardFilterData => {
         return {
             dashboard: dashboards.find(d => d.id === dashboard),
             dateMonth: getPeriod(lastMonths, month || ""),
-            orgUnits,
+            orgUnitPaths,
         };
     };
 
@@ -91,10 +91,10 @@ export const DashboardFilter: React.FC<DashboardFilterProps> = React.memo(({ chi
     };
 
     const onChangeOrgUnit = (value: OrgUnitPath[]) => {
-        setOrgUnits(value);
+        setOrgUnitPaths(value);
         onChange({
             ...getCurrentFilter(),
-            orgUnits: value,
+            orgUnitPaths: value,
         });
     };
 
@@ -136,7 +136,7 @@ export const DashboardFilter: React.FC<DashboardFilterProps> = React.memo(({ chi
                 label={i18n.t("Last four months")}
             />
 
-            <OrgUnitFilter selected={orgUnits ?? []} onChange={onChangeOrgUnit} />
+            <OrgUnitFilter selected={orgUnitPaths ?? []} onChange={onChangeOrgUnit} />
 
             {children}
         </Container>

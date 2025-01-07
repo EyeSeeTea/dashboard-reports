@@ -26,7 +26,7 @@ export const OrgUnitFilter: React.FC<OrgUnitFilterProps> = React.memo(props => {
         orgUnitLoader.type === "loading"
             ? i18n.t("Loading...")
             : orgUnitLoader.type === "loaded"
-            ? orgUnitLoader.value.map(ou => ou.displayName).join(", ")
+            ? orgUnitLoader.value.map(ou => ou.name).join(", ")
             : i18n.t("Error");
     return (
         <>

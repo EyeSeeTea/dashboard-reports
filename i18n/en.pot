@@ -41,6 +41,24 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
+msgid "Loading..."
+msgstr ""
+
+msgid "Error"
+msgstr ""
+
+msgid "Select Organization Units"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Select"
+msgstr ""
+
+msgid "Clear"
+msgstr ""
+
 msgid "Back"
 msgstr ""
 

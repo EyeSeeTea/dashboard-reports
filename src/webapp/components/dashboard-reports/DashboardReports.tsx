@@ -17,6 +17,7 @@ import { useGenerateDocxReport } from "../../hooks/useGenerateDocxReport";
 import { useAppContext } from "../../contexts/app-context";
 import { Visualization } from "../visualization/Visualization";
 import { Link } from "react-router-dom";
+import { getIdFromPath } from "../../../domain/entities/OrgUnit";
 
 export const DashboardReports: React.FC = React.memo(() => {
     const appContext = useAppContext();
@@ -59,6 +60,8 @@ export const DashboardReports: React.FC = React.memo(() => {
     if (currentDashboard && !filterIsEmpty) {
         dashboardItems = currentDashboard.dashboardItems;
     }
+
+    const orgUnitIds = dashboard?.orgUnitPaths?.length ? dashboard.orgUnitPaths.map(getIdFromPath) : undefined;
 
     return (
         <>
@@ -115,7 +118,11 @@ export const DashboardReports: React.FC = React.memo(() => {
 
                                 <VisualizationFrame className="visualization">
                                     {dashboard && (
-                                        <Visualization dashboardItem={dashboardItem} period={dashboard.dateMonth} />
+                                        <Visualization
+                                            dashboardItem={dashboardItem}
+                                            period={dashboard.dateMonth}
+                                            orgUnits={orgUnitIds}
+                                        />
                                     )}
                                 </VisualizationFrame>
                             </VisualizationItem>

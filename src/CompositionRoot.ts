@@ -15,6 +15,9 @@ import { StorageName } from "./domain/entities/Settings";
 import { DataStoreD2Repository } from "./data/repositories/DataStoreD2Repository";
 import { PluginVisualizationD2Repository } from "./data/repositories/PluginVisualizationD2Repository";
 import { GetPluginVisualizationUseCase } from "./domain/usecases/GetPluginVisualizationUseCase";
+import { GetRootOrgUnitsUseCase } from "./domain/usecases/GetRootOrgUnitsUseCase";
+import { OrgUnitD2Repository } from "./data/repositories/OrgUnitD2Repository";
+import { GetOrgUnitsByIdsUseCase } from "./domain/usecases/GetOrgUnitsByIdsUseCase";
 import { InitDefaultSettingsUseCase } from "./domain/usecases/InitDefaultSettingsUseCase";
 import { DefaultSettingsHTTPRepository } from "./data/repositories/DefaultSettingsHTTPRepository";
 
@@ -26,6 +29,7 @@ export function getCompositionRoot(api: D2Api, instance: Instance, storageName: 
         storageName === "datastore" ? new DataStoreD2Repository(api) : new SettingsD2ConstantRepository(api);
     const exportDocxRepository = new DashboardExportDocxRepository();
     const pluginVisualizationsRepository = new PluginVisualizationD2Repository(api);
+    const orgUnitsRepository = new OrgUnitD2Repository(api);
     const defaultSettingsRepository = new DefaultSettingsHTTPRepository();
 
     return {
@@ -48,6 +52,10 @@ export function getCompositionRoot(api: D2Api, instance: Instance, storageName: 
         },
         export: {
             save: new SaveRawReportUseCase(exportDocxRepository),
+        },
+        orgUnits: {
+            getRoots: new GetRootOrgUnitsUseCase(orgUnitsRepository),
+            getByIds: new GetOrgUnitsByIdsUseCase(orgUnitsRepository),
         },
     };
 }

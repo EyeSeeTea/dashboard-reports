@@ -6,7 +6,7 @@ import { D2Api, MetadataPick } from "../../types/d2-api";
 import { FutureData } from "../../domain/entities/Future";
 import { apiToFuture } from "../../utils/futures";
 import { DashboardItem } from "../../domain/entities/Dashboard";
-import { generatePeriods, PeriodItem, ReportPeriod } from "../../domain/entities/DateMonth";
+import { generatePeriods, ReportPeriod } from "../../domain/entities/DateMonth";
 import { Maybe } from "../../types/utils";
 
 export class PluginVisualizationD2Repository implements PluginVisualizationRepository {
@@ -14,7 +14,7 @@ export class PluginVisualizationD2Repository implements PluginVisualizationRepos
 
     get(options: {
         dashboardItem: DashboardItem;
-        orgUnitId: Maybe<Id>;
+        orgUnitIds: Maybe<Id[]>;
         period: ReportPeriod;
     }): FutureData<PluginVisualization> {
         const params = processFieldsFilterParams({ fields: visualizationFields, filter: {} });
@@ -24,7 +24,7 @@ export class PluginVisualizationD2Repository implements PluginVisualizationRepos
         );
         return res$
             .map(res => this.applyPeriodFilters(res, options.period))
-            .map(res => (options.orgUnitId ? this.applyOrgUnitFilters(res, options.orgUnitId) : res))
+            .map(res => this.applyOrgUnitFilters(res, options.orgUnitIds))
             .map(res => (isD2Map(res) ? { ...res, type: "MAP" } : res));
     }
 
@@ -36,40 +36,48 @@ export class PluginVisualizationD2Repository implements PluginVisualizationRepos
         const itemsPeriod = generatePeriods(reportPeriod);
         if (itemsPeriod.length === 0) {
             return item;
-        } else if (isD2Map(item)) {
+        } else {
+            return this.applyFilters(item, dimension => ({
+                ...dimension,
+                items: dimension.dimension === "pe" ? itemsPeriod : dimension.items,
+            }));
+        }
+    }
+
+    private applyOrgUnitFilters(item: D2PluginVisualization, orgUnitIds: Maybe<Id[]>) {
+        if (!orgUnitIds || orgUnitIds.length === 0) {
+            return item;
+        }
+        const newItems = orgUnitIds.map(id => ({ id, dimensionItemType: "ORGANISATION_UNIT" }));
+        return this.applyFilters(item, dimension => ({
+            ...dimension,
+            items: dimension.dimension === "ou" ? newItems : dimension.items,
+        }));
+    }
+
+    private applyFilters(item: D2PluginVisualization, mapper: (dimension: D2Dimension) => D2Dimension) {
+        if (isD2Map(item)) {
             return {
                 ...item,
                 mapViews: item.mapViews.map((mapView: MapView) => ({
                     ...mapView,
-                    ...this.applyPeriodToDimensionAttrs(mapView as WithDimensionAttributes, itemsPeriod),
+                    ...this.applyFilterToDimensionAttrs(mapView as WithDimensionAttributes, mapper),
                 })),
             } as D2MapVisualization;
         } else {
             return {
                 ...item,
-                ...this.applyPeriodToDimensionAttrs(item as WithDimensionAttributes, itemsPeriod),
+                ...this.applyFilterToDimensionAttrs(item as WithDimensionAttributes, mapper),
             };
         }
     }
 
-    private applyOrgUnitFilters(item: D2PluginVisualization, _orgUnit: string) {
-        // TODO: filter by org unit
-        return item;
-    }
-
-    private applyPeriodToDimensionAttrs(obj: WithDimensionAttributes, period: PeriodItem[]) {
+    private applyFilterToDimensionAttrs(obj: WithDimensionAttributes, mapper: (dimension: D2Dimension) => D2Dimension) {
         return {
-            rows: this.applyPeriodToDimensions(obj.rows, period),
-            columns: this.applyPeriodToDimensions(obj.columns, period),
-            filters: this.applyPeriodToDimensions(obj.filters, period),
+            rows: obj.rows.map(mapper),
+            columns: obj.columns.map(mapper),
+            filters: obj.filters.map(mapper),
         };
-    }
-
-    private applyPeriodToDimensions(dimensions: D2Dimension[], period: PeriodItem[]) {
-        return dimensions.map(dimension => ({
-            ...dimension,
-            items: dimension.dimension === "pe" ? period : dimension.items,
-        }));
     }
 }
 
@@ -127,7 +135,7 @@ type DimensionType = "ou" | "pe" | (string & {});
 interface D2DimensionItem {
     dimensionItemType?: string;
     id: string;
-    name: string;
+    name?: string;
 }
 
 interface D2Dimension {

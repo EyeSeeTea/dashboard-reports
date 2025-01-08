@@ -7,17 +7,17 @@ import { Id } from "../../domain/entities/Ref";
 
 interface UseVisualizationLoaderArgs {
     dashboardItem: DashboardItem;
-    orgUnitId: Maybe<Id>;
+    orgUnitIds: Maybe<Id[]>;
     period: ReportPeriod;
 }
 
-export function useVisualizationLoader({ dashboardItem, orgUnitId, period }: UseVisualizationLoaderArgs) {
+export function useVisualizationLoader({ dashboardItem, orgUnitIds, period }: UseVisualizationLoaderArgs) {
     return useLoader(
         React.useCallback(
             compositionRoot => {
-                return compositionRoot.pluginVisualizations.get.execute({ dashboardItem, orgUnitId, period });
+                return compositionRoot.pluginVisualizations.get.execute({ dashboardItem, orgUnitIds, period });
             },
-            [dashboardItem, orgUnitId, period]
+            [dashboardItem, orgUnitIds, period]
         )
     );
 }

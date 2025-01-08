@@ -9,7 +9,7 @@ export class SaveSettingsUseCase {
 
     public execute(options: { settings: Settings; currentUser: User }): FutureData<void> {
         if (!options.currentUser.isAdmin()) {
-            return Future.error(i18n.t("Not authorized: only admins can save settings"));
+            return Future.error(i18n.t("Not authorized - only admins can save settings"));
         }
         return this.settingsRepository.save(options.settings);
     }

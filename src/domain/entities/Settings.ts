@@ -26,4 +26,8 @@ export function getDefaultValues(): Omit<Settings, "id"> {
     };
 }
 
+export function areSettingsInitialized(settings: Settings): boolean {
+    return !!settings.id && settings.templates.length > 0;
+}
+
 export type StorageName = "constants" | "datastore";

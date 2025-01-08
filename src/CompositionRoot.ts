@@ -15,6 +15,8 @@ import { StorageName } from "./domain/entities/Settings";
 import { DataStoreD2Repository } from "./data/repositories/DataStoreD2Repository";
 import { PluginVisualizationD2Repository } from "./data/repositories/PluginVisualizationD2Repository";
 import { GetPluginVisualizationUseCase } from "./domain/usecases/GetPluginVisualizationUseCase";
+import { InitDefaultSettingsUseCase } from "./domain/usecases/InitDefaultSettingsUseCase";
+import { DefaultSettingsHTTPRepository } from "./data/repositories/DefaultSettingsHTTPRepository";
 
 export function getCompositionRoot(api: D2Api, instance: Instance, storageName: StorageName) {
     const instanceRepository = new InstanceDefaultRepository(instance);
@@ -24,6 +26,7 @@ export function getCompositionRoot(api: D2Api, instance: Instance, storageName: 
         storageName === "datastore" ? new DataStoreD2Repository(api) : new SettingsD2ConstantRepository(api);
     const exportDocxRepository = new DashboardExportDocxRepository();
     const pluginVisualizationsRepository = new PluginVisualizationD2Repository(api);
+    const defaultSettingsRepository = new DefaultSettingsHTTPRepository();
 
     return {
         instance: {
@@ -41,6 +44,7 @@ export function getCompositionRoot(api: D2Api, instance: Instance, storageName: 
         settings: {
             get: new GetSettingsUseCase(settingsRepository),
             save: new SaveSettingsUseCase(settingsRepository),
+            initDefaults: new InitDefaultSettingsUseCase(settingsRepository, defaultSettingsRepository),
         },
         export: {
             save: new SaveRawReportUseCase(exportDocxRepository),

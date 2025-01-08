@@ -50,9 +50,6 @@ msgstr ""
 msgid "Select Organization Units"
 msgstr ""
 
-msgid "Cancel"
-msgstr ""
-
 msgid "Select"
 msgstr ""
 

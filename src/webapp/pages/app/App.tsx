@@ -6,7 +6,7 @@ import { MuiThemeProvider } from "@material-ui/core/styles";
 import OldMuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import React, { useEffect, useState } from "react";
 import { appConfig } from "../../../app-config";
-import { getCompositionRoot } from "../../../CompositionRoot";
+import { CompositionRoot, getCompositionRoot } from "../../../CompositionRoot";
 import { Instance } from "../../../data/entities/Instance";
 import { areSettingsInitialized, Settings, StorageName } from "../../../domain/entities/Settings";
 import { D2Api } from "../../../types/d2-api";
@@ -26,6 +26,19 @@ export interface AppProps {
     instance: Instance;
 }
 
+async function getSettingsOrInitialize(compositionRoot: CompositionRoot): Promise<Settings> {
+    const settingsFromStorage = (await compositionRoot.settings.get.execute().runAsync()).data;
+    if (!settingsFromStorage) {
+        throw new Error("Cannot load settings");
+    } else if (!areSettingsInitialized(settingsFromStorage)) {
+        const defaultSettings = (await compositionRoot.settings.initDefaults.execute().runAsync()).data;
+        if (!defaultSettings) throw new Error("Error initializing default settings");
+        return defaultSettings;
+    } else {
+        return settingsFromStorage;
+    }
+}
+
 export const App: React.FC<AppProps> = React.memo(function App({ api, d2, instance }) {
     const [loading, setLoading] = useState(true);
     const [appContext, setAppContext] = useState<AppContextState | null>(null);
@@ -36,18 +49,8 @@ export const App: React.FC<AppProps> = React.memo(function App({ api, d2, instan
             const storageName = (process.env.REACT_APP_STORAGE as Maybe<StorageName>) || "datastore";
             const compositionRoot = getCompositionRoot(api, instance, storageName);
             const currentUser = (await compositionRoot.users.getCurrent.execute().runAsync()).data;
-            const settingsFromStorage = (await compositionRoot.settings.get.execute().runAsync()).data;
             const pluginVersion = `${_.get(d2, "system.version.major")}${_.get(d2, "system.version.minor")}`;
-            let settings: Settings;
-            if (!settingsFromStorage) {
-                throw new Error("Cannot load settings");
-            } else if (!areSettingsInitialized(settingsFromStorage)) {
-                const defaultSettings = (await compositionRoot.settings.initDefaults.execute().runAsync()).data;
-                if (!defaultSettings) throw new Error("Error initializing default settings");
-                settings = defaultSettings;
-            } else {
-                settings = settingsFromStorage;
-            }
+            const settings = await getSettingsOrInitialize(compositionRoot);
             if (!currentUser) throw new Error("User not logged in");
 
             setAppContext({ api, currentUser, compositionRoot, isDev, settings, setAppContext, pluginVersion });

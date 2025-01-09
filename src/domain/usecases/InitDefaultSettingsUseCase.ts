@@ -1,4 +1,4 @@
-import { Future, FutureData } from "../entities/Future";
+import { FutureData } from "../entities/Future";
 import { Settings } from "../entities/Settings";
 import { SettingsRepository } from "../repositories/SettingsRepository";
 import { DefaultSettingsRepository } from "../repositories/DefaultSettingsRepository";
@@ -11,7 +11,7 @@ export class InitDefaultSettingsUseCase {
 
     public execute(): FutureData<Settings> {
         return this.defaultSettingsRepository.get().flatMap(defaultSettings => {
-            return this.settingsRepository.save(defaultSettings).flatMap(() => Future.success(defaultSettings));
+            return this.settingsRepository.save(defaultSettings).map(() => defaultSettings);
         });
     }
 }

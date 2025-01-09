@@ -1,12 +1,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i18next-conv\n"
-"POT-Creation-Date: 2024-12-30T12:25:50.318Z\n"
+"POT-Creation-Date: 2025-01-08T17:04:38.103Z\n"
 "PO-Revision-Date: 2018-10-25T09:02:35.143Z\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+msgid "Not authorized - only admins can save settings"
+msgstr ""
 
 msgid "Select Dashboard"
 msgstr "Seleccionar panel"
@@ -26,19 +29,16 @@ msgstr ""
 msgid "Export to Word"
 msgstr ""
 
-msgid "App Settings"
-msgstr ""
-
 msgid "Font Size"
 msgstr ""
 
 msgid "Show/Hide Feedback"
 msgstr ""
 
-msgid "Save"
+msgid "Cancel"
 msgstr ""
 
-msgid "Close"
+msgid "Save"
 msgstr ""
 
 msgid "Loading..."
@@ -48,9 +48,6 @@ msgid "Error"
 msgstr ""
 
 msgid "Select Organization Units"
-msgstr ""
-
-msgid "Cancel"
 msgstr ""
 
 msgid "Select"
@@ -69,6 +66,9 @@ msgid "Legacy plugin \"{{legacyReportType}}\" not found"
 msgstr ""
 
 msgid "Templates not found"
+msgstr ""
+
+msgid "Settings saved"
 msgstr ""
 
 msgid "Distributed under GNU GLPv3"
@@ -98,6 +98,9 @@ msgid "Médicos Sin Fronteras"
 msgstr ""
 
 msgid "EyeSeeTea"
+msgstr ""
+
+msgid "App Settings"
 msgstr ""
 
 #~ msgid "Add"

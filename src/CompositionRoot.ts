@@ -18,6 +18,8 @@ import { GetPluginVisualizationUseCase } from "./domain/usecases/GetPluginVisual
 import { GetRootOrgUnitsUseCase } from "./domain/usecases/GetRootOrgUnitsUseCase";
 import { OrgUnitD2Repository } from "./data/repositories/OrgUnitD2Repository";
 import { GetOrgUnitsByIdsUseCase } from "./domain/usecases/GetOrgUnitsByIdsUseCase";
+import { InitDefaultSettingsUseCase } from "./domain/usecases/InitDefaultSettingsUseCase";
+import { DefaultSettingsHTTPRepository } from "./data/repositories/DefaultSettingsHTTPRepository";
 
 export function getCompositionRoot(api: D2Api, instance: Instance, storageName: StorageName) {
     const instanceRepository = new InstanceDefaultRepository(instance);
@@ -28,6 +30,7 @@ export function getCompositionRoot(api: D2Api, instance: Instance, storageName: 
     const exportDocxRepository = new DashboardExportDocxRepository();
     const pluginVisualizationsRepository = new PluginVisualizationD2Repository(api);
     const orgUnitsRepository = new OrgUnitD2Repository(api);
+    const defaultSettingsRepository = new DefaultSettingsHTTPRepository();
 
     return {
         instance: {
@@ -45,6 +48,7 @@ export function getCompositionRoot(api: D2Api, instance: Instance, storageName: 
         settings: {
             get: new GetSettingsUseCase(settingsRepository),
             save: new SaveSettingsUseCase(settingsRepository),
+            initDefaults: new InitDefaultSettingsUseCase(settingsRepository, defaultSettingsRepository),
         },
         export: {
             save: new SaveRawReportUseCase(exportDocxRepository),

@@ -17,7 +17,20 @@ export const appConfig: AppConfig = {
             buttonPosition: "bottom-end",
         },
     },
+    header: false,
+    footer: false,
 };
+
+export interface HeaderOptions {
+    title: string;
+    background?: string;
+    color?: string;
+}
+export interface FooterOptions {
+    text: string;
+    background?: string;
+    color?: string;
+}
 
 export interface AppConfig {
     appKey: string;
@@ -25,4 +38,6 @@ export interface AppConfig {
         showShareButton: boolean;
     };
     feedback?: FeedbackOptions;
+    header: HeaderOptions | false;
+    footer: FooterOptions | false;
 }

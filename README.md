@@ -181,3 +181,28 @@ Now you can start the server and check if every visualization is working properl
 ### Storage
 
 Settings can be saved in the data store (default) or as constants. Use the env variable **REACT_APP_STORAGE** to select which one to use (`datastore` or `constants`).
+
+### Custom Header and Footer
+
+The header and footer can be configured in `src/app-config.ts`. They can be disabled by setting their values to `false`.
+See `HeaderOptions` and `FooterOptions` types for supported options.
+
+Example config:
+
+```typescript
+{
+ header: {
+     title: "Dashboard Reports - Custom Header Title",
+     background: "rgba(19,52,59,1)",
+     color: "white",
+ },
+ footer: {
+     text: `Dashboard Reports - Custom Footer.
+     Multi-line text is allowed.
+     TBD: More customization options.
+     `,
+     background: "linear-gradient(90deg, rgba(31,41,30,1) 0%, rgba(20,50,28,1) 50%, rgba(31,41,30,1) 100%)",
+     color: "white",
+ }
+}
+```

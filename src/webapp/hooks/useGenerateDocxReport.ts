@@ -6,37 +6,15 @@ import { DashboardFilterData } from "../components/dashboard-filter/DashboardFil
 import { getImagesFromDom } from "../utils/images";
 import { Settings, TemplateReport } from "../../domain/entities/Settings";
 
-type useReportsType = {
+type useGenerateDocxReportArgs = {
     dashboard?: DashboardFilterData;
     settings: Settings | undefined;
 };
 
-export function useReports({ dashboard, settings }: useReportsType) {
+export function useGenerateDocxReport({ dashboard, settings }: useGenerateDocxReportArgs) {
     const { compositionRoot } = useAppContext();
     const snackbar = useSnackbar();
     const loading = useLoading();
-    const filterIsEmpty = !dashboard?.dashboard;
-
-    React.useEffect(() => {
-        if (filterIsEmpty) return;
-
-        if (dashboard.dashboard?.dashboardItems) {
-            loading.show();
-
-            compositionRoot.dashboards.getReports.execute(dashboard.dashboard?.dashboardItems, dashboard.dateMonth).run(
-                visualizationsData => {
-                    visualizationsData.forEach(visualization => {
-                        window[visualization.reportType]?.load([visualization]);
-                    });
-                    loading.hide();
-                },
-                err => {
-                    snackbar.openSnackbar("error", err);
-                    loading.hide();
-                }
-            );
-        }
-    }, [dashboard, filterIsEmpty, snackbar, compositionRoot, loading]);
 
     const generateDocxReport = React.useCallback(
         (template: TemplateReport) => {
@@ -51,12 +29,13 @@ export function useReports({ dashboard, settings }: useReportsType) {
                     .then(blob => {
                         saveAs(blob, `${template.fileName}.docx`);
                     })
+                    .catch(err => snackbar.error(err.message))
                     .finally(() => {
                         loading.hide();
                     });
             }
         },
-        [dashboard, compositionRoot.export.save, loading, settings]
+        [dashboard, compositionRoot.export.save, loading, settings, snackbar]
     );
 
     return { generateDocxReport };

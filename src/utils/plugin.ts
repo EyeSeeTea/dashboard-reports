@@ -1,5 +1,10 @@
+const loadedScripts = new Map<string, Promise<void>>();
+
 export function loadJsPlugin(pluginUrl: string) {
-    return new Promise((resolve, reject) => {
+    if (loadedScripts.has(pluginUrl)) {
+        return loadedScripts.get(pluginUrl) as Promise<void>;
+    }
+    const promise = new Promise<void>((resolve, reject) => {
         const scriptEle = document.createElement("script");
 
         scriptEle.setAttribute("src", pluginUrl);
@@ -9,18 +14,13 @@ export function loadJsPlugin(pluginUrl: string) {
 
         document.head.appendChild(scriptEle);
 
-        scriptEle.addEventListener("load", resolve);
-        scriptEle.addEventListener("error", reject);
+        scriptEle.addEventListener("load", () => resolve());
+        scriptEle.addEventListener("error", () => {
+            reject(new Error(`Error loading script ${pluginUrl}`));
+            loadedScripts.delete(pluginUrl);
+        });
     });
-}
 
-export async function loadPluginsByVersion(version: string) {
-    const pluginsFilesNames = [
-        "reporttable.min.js",
-        "chart.min.js",
-        "map.min.js",
-        "eventchart.min.js",
-        "eventreport.min.js",
-    ];
-    return Promise.all(pluginsFilesNames.map(fileName => loadJsPlugin(`${version}/${fileName}`)));
+    loadedScripts.set(pluginUrl, promise);
+    return promise;
 }

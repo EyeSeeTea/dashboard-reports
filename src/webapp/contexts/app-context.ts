@@ -11,6 +11,7 @@ export interface AppContextState {
     compositionRoot: CompositionRoot;
     isDev: boolean;
     settings: Settings;
+    pluginVersion: string;
     setAppContext: React.Dispatch<React.SetStateAction<AppContextState | null>>;
 }
 

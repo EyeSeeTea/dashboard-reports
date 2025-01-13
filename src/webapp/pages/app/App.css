@@ -11,3 +11,19 @@ body {
 li {
     line-height: 1.75;
 }
+
+html,
+body,
+#root {
+    height: 100%;
+}
+
+#root {
+    display: flex;
+    flex-direction: column;
+}
+
+#root .content {
+    flex: 1;
+    padding-block-end: 1em;
+}

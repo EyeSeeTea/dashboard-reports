@@ -9,7 +9,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 msgid "Select Dashboard"
-msgstr ""
+msgstr "Seleccionar panel"
 
 msgid "Select Month"
 msgstr ""

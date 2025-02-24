@@ -8,22 +8,22 @@ export const appConfig: AppConfig = {
     feedback: {
         repositories: {
             clickUp: {
-                listId: "176458462",
+                listId: "901208289349",
                 title: "[User feedback] {title}",
                 body: "## dhis2\n\nUsername: {username}\n\n{body}",
             },
         },
         layoutOptions: {
             buttonPosition: "bottom-end",
-            descriptionTemplate: "## Summary\n\n## Steps to reproduce\n\n## Actual results\n\n## Expected results\n\n"
+            descriptionTemplate: "## Summary\n\n## Steps to reproduce\n\n## Actual results\n\n## Expected results\n\n",
         },
     },
 };
 
-export interface AppConfig {
+type AppConfig = {
     appKey: string;
     appearance: {
         showShareButton: boolean;
     };
     feedback?: FeedbackOptions;
-}
+};

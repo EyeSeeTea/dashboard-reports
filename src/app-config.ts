@@ -15,6 +15,7 @@ export const appConfig: AppConfig = {
         },
         layoutOptions: {
             buttonPosition: "bottom-end",
+            descriptionTemplate: "## Summary\n\n## Steps to reproduce\n\n## Actual results\n\n## Expected results\n\n"
         },
     },
 };

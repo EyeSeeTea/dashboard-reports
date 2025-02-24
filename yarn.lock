@@ -4816,10 +4816,10 @@
     rxjs-compat "6.6.3"
     throttle-debounce "2.1.0"
 
-"@eyeseetea/feedback-component@0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@eyeseetea/feedback-component/-/feedback-component-0.0.3.tgz#64b5de12070ba069e7103400563c7b0e2c3b74be"
-  integrity sha512-KRzuc7CXCcKBZZqq4JvW1wmI83sI7smsGGymOqAfqDJtOv3Yo6hzwjiclu0oYj04rsWawB/PR0Pd1osXIZ14Zg==
+"@eyeseetea/feedback-component@0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@eyeseetea/feedback-component/-/feedback-component-0.1.2.tgz#e18d932d0fa246b437b7d6ed73087fb468d731eb"
+  integrity sha512-anvAagikfX7YFWpyeq9b9eilfVfNCPTnaobLtyhXfHlcJqZVh4eLfFOQT3HLfy3E2AwiBF8vFwXwhQUxsuQHHA==
   dependencies:
     "@date-io/core" "2.13.1"
     "@date-io/moment" "2.13.1"

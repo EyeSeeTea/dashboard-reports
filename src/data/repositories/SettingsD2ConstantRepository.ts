@@ -38,13 +38,15 @@ export class SettingsD2ConstantRepository implements SettingsRepository {
     }
 
     public save(settings: Settings): FutureData<void> {
+        const name = "Dashboard Reports Storage";
         return runMetadata(
             this.api.metadata.post({
                 constants: [
                     {
                         id: settings.id ? settings.id : getUid("settings"),
                         code: SETTINGS_CODE,
-                        name: "Dashboard Reports Storage",
+                        name,
+                        shortName: name,
                         description: JSON.stringify(
                             {
                                 fontSize: settings.fontSize,

@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import { MarkdownViewer } from "../../components/markdown/MarkdownViewer";
 import { PageHeader } from "../../components/page-header/PageHeader";
 

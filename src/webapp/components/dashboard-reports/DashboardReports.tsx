@@ -11,7 +11,7 @@ import { useSnackbar, useLoading } from "@eyeseetea/d2-ui-components";
 import { DashboardItem, ReportItem } from "../../../domain/entities/Dashboard";
 import { DashboardFilter, DashboardFilterData } from "../../components/dashboard-filter/DashboardFilter";
 import { DashboardSettings } from "../../components/dashboard-settings/DashboardSettings";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import { Settings, TemplateReport } from "../../../domain/entities/Settings";
 import { useDashboard } from "../../hooks/useDashboard";
 import { useSettings } from "../../hooks/useSettings";

@@ -2,7 +2,7 @@ import { Future, FutureData } from "../entities/Future";
 import { Settings } from "../entities/Settings";
 import { User } from "../entities/User";
 import { SettingsRepository } from "../repositories/SettingsRepository";
-import i18n from "../../locales";
+import i18n from "../../utils/i18n";
 
 export class SaveSettingsUseCase {
     constructor(private settingsRepository: SettingsRepository) {}

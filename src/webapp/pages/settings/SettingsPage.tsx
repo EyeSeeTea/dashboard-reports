@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import { PageHeader } from "../../components/page-header/PageHeader";
 import { useSettings } from "../../hooks/useSettings";
 import { useAppContext } from "../../contexts/app-context";

@@ -6,7 +6,7 @@ import { useAppContext } from "../../contexts/app-context";
 import { OrgUnitPicker } from "./OrgUnitPicker";
 import { useOrgUnitRoots } from "../../hooks/useOrgUnitRoots";
 import { useOrgUnitLoader } from "../../hooks/useOrgUnitLoader";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import { ConfirmationDialog } from "@eyeseetea/d2-ui-components";
 
 export interface OrgUnitFilterProps {

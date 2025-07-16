@@ -5,7 +5,7 @@ import { useSnackbar } from "@eyeseetea/d2-ui-components";
 import { useDhis2Url, useLegacyVisualizationScriptUrl } from "./useDhis2Url";
 import { PluginVisualization } from "../../domain/entities/PluginVisualization";
 import { LoaderState } from "./useLoader";
-import i18n from "../../locales";
+import i18n from "../../utils/i18n";
 
 export function useLegacyVisualizationPlugin(dashboardItem: DashboardItem, visualization: PluginVisualization) {
     const snackbar = useSnackbar();

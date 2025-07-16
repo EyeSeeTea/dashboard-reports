@@ -5,7 +5,7 @@ import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormGroup from "@material-ui/core/FormGroup";
 import { Settings } from "../../../domain/entities/Settings";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import styled from "styled-components";
 
 export const DashboardSettingsForm: React.FC<DashboardSettingsFormProps> = React.memo(

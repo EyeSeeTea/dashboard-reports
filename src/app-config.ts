@@ -8,13 +8,14 @@ export const appConfig: AppConfig = {
     feedback: {
         repositories: {
             clickUp: {
-                listId: "176458462",
+                listId: "901208289349",
                 title: "[User feedback] {title}",
                 body: "## dhis2\n\nUsername: {username}\n\n{body}",
             },
         },
         layoutOptions: {
             buttonPosition: "bottom-end",
+            descriptionTemplate: "## Summary\n\n## Steps to reproduce\n\n## Actual results\n\n## Expected results\n\n",
         },
     },
     header: false,
@@ -32,7 +33,7 @@ export interface FooterOptions {
     color?: string;
 }
 
-export interface AppConfig {
+export type AppConfig = {
     appKey: string;
     appearance: {
         showShareButton: boolean;
@@ -41,3 +42,4 @@ export interface AppConfig {
     header: HeaderOptions | false;
     footer: FooterOptions | false;
 }
+

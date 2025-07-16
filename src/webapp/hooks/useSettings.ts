@@ -2,7 +2,7 @@ import React from "react";
 import { useAppContext } from "../contexts/app-context";
 import { useLoading, useSnackbar } from "@eyeseetea/d2-ui-components";
 import { Settings, TemplateReport } from "../../domain/entities/Settings";
-import i18n from "../../locales";
+import i18n from "../../utils/i18n";
 
 export function useSettings(template: TemplateReport | undefined) {
     const snackbar = useSnackbar();

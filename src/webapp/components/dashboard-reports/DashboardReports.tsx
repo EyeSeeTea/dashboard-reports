@@ -10,7 +10,7 @@ import Typography from "@material-ui/core/Typography";
 import { useSnackbar, useLoading } from "@eyeseetea/d2-ui-components";
 import { DashboardItem } from "../../../domain/entities/Dashboard";
 import { DashboardFilter, DashboardFilterData } from "../../components/dashboard-filter/DashboardFilter";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import { TemplateReport } from "../../../domain/entities/Settings";
 import { useDashboard } from "../../hooks/useDashboard";
 import { useGenerateDocxReport } from "../../hooks/useGenerateDocxReport";

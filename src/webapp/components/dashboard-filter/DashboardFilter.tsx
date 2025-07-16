@@ -9,7 +9,7 @@ import Checkbox from "@material-ui/core/Checkbox";
 import { DatePicker } from "@eyeseetea/d2-ui-components";
 import { Dashboard } from "../../../domain/entities/Dashboard";
 import { ReportPeriod } from "../../../domain/entities/DateMonth";
-import i18n from "../../../locales";
+import i18n from "../../../utils/i18n";
 import { OrgUnitFilter } from "../org-units-filter/OrgUnitFilter";
 import { Maybe } from "../../../types/utils";
 import { OrgUnitPath } from "../../../domain/entities/OrgUnit";

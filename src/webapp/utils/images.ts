@@ -1,5 +1,6 @@
 import html2canvas from "html2canvas";
 import { DashboardItem } from "../../domain/entities/Dashboard";
+import { Maybe } from "../../types/utils";
 
 export interface DocxItem {
     title: string;
@@ -48,6 +49,18 @@ function getCanvasInformation(dashboardItem: DocxItem, canvas: HTMLCanvasElement
     };
 }
 
+function getVisualizationElement(dashboardItem: DashboardItem) {
+    const itemElement = document.getElementById(dashboardItem.elementId);
+    if (!itemElement) {
+        return null;
+    }
+    if (itemElement.classList.contains("iframe-visualization")) {
+        return (itemElement.querySelector(`#${dashboardItem.elementId} iframe`) as Maybe<HTMLIFrameElement>)
+            ?.contentDocument;
+    }
+    return itemElement;
+}
+
 export function getImagesFromDom(dashboardItems: DashboardItem[]) {
     return dashboardItems
         .map(dashboardItem => {
@@ -58,27 +71,32 @@ export function getImagesFromDom(dashboardItems: DashboardItem[]) {
                 width: 0,
                 height: 0,
             };
-            const $vizDomEl = document.querySelector(`#${dashboardItem.elementId}`);
-
-            if (dashboardItem.reportType === "mapPlugin") {
-                const canvasEl = $vizDomEl?.querySelector("canvas") as HTMLCanvasElement;
+            const root = getVisualizationElement(dashboardItem);
+            if (!root) {
+                console.warn("No root element found for ", dashboardItem.elementId);
+                return newEl;
+            }
+            if (dashboardItem.type === "MAP") {
+                const canvasEl = root.querySelector("canvas") as HTMLCanvasElement;
                 if (canvasEl) {
                     newEl.base64 = canvasEl.toDataURL();
                     newEl.width = canvasEl.width;
                     newEl.height = canvasEl.height;
                 }
-            } else if (dashboardItem.reportType === "chartPlugin" || dashboardItem.reportType === "eventChartPlugin") {
-                newEl.domEl = $vizDomEl?.querySelector("svg") as SVGElement;
             } else if (
-                dashboardItem.reportType === "reportTablePlugin" ||
-                dashboardItem.reportType === "eventReportPlugin"
+                dashboardItem.type === "REPORT" ||
+                dashboardItem.type === "EVENT_REPORT" ||
+                dashboardItem.visualization?.type === "PIVOT_TABLE"
             ) {
-                newEl.domEl = $vizDomEl?.querySelector("table") as HTMLTableElement;
+                newEl.domEl = root.querySelector("table") as HTMLTableElement;
                 const tableRects = newEl.domEl?.getClientRects();
                 if (tableRects[0]) {
                     newEl.width = tableRects[0].width;
                     newEl.height = tableRects[0].height;
                 }
+            } else if (["CHART", "EVENT_CHART", "VISUALIZATION"].includes(dashboardItem.type)) {
+                const errorDiv = root.querySelector('[data-test="start-screen-error-container"]');
+                newEl.domEl = errorDiv ?? (root.querySelector("svg") as SVGElement);
             }
             return newEl;
         })

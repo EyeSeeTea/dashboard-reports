@@ -10,10 +10,14 @@ import { DatePicker } from "@eyeseetea/d2-ui-components";
 import { Dashboard } from "../../../domain/entities/Dashboard";
 import { ReportPeriod } from "../../../domain/entities/DateMonth";
 import i18n from "../../../utils/i18n";
+import { OrgUnitFilter } from "../org-units-filter/OrgUnitFilter";
+import { Maybe } from "../../../types/utils";
+import { OrgUnitPath } from "../../../domain/entities/OrgUnit";
 
 export type DashboardFilterData = {
     dashboard?: Dashboard;
     dateMonth: ReportPeriod;
+    orgUnitPaths: Maybe<OrgUnitPath[]>;
 };
 
 function formatDate(value: string) {
@@ -49,39 +53,49 @@ export const DashboardFilter: React.FC<DashboardFilterProps> = React.memo(({ chi
     const [dashboard, setDashboard] = React.useState<string>("");
     const [month, setMonth] = React.useState<string | null>(null);
     const [lastMonths, setLastMonths] = React.useState<boolean>(false);
+    const [orgUnitPaths, setOrgUnitPaths] = React.useState<Maybe<OrgUnitPath[]>>();
+
+    const getCurrentFilter = (): DashboardFilterData => {
+        return {
+            dashboard: dashboards.find(d => d.id === dashboard),
+            dateMonth: getPeriod(lastMonths, month || ""),
+            orgUnitPaths,
+        };
+    };
 
     const onChangeSelect = (event: React.ChangeEvent<{ value: unknown }>) => {
         const value = event.target.value as string;
         setDashboard(value);
-        const dashboardSelected = dashboards.find(d => d.id === value);
-        const dashboardData: DashboardFilterData = {
-            dashboard: dashboardSelected,
-            dateMonth: getPeriod(lastMonths, month || ""),
-        };
-
-        onChange(dashboardData);
+        onChange({
+            ...getCurrentFilter(),
+            dashboard: dashboards.find(d => d.id === value),
+        });
     };
 
     const onChangeMonth = (moment: MomentProps) => {
         const value = moment ? moment.format() : null;
-        const dashboardSelected = dashboards.find(d => d.id === dashboard);
-        const dashboardData: DashboardFilterData = {
-            dashboard: dashboardSelected,
-            dateMonth: getPeriod(lastMonths, value || ""),
-        };
         setMonth(value);
-        onChange(dashboardData);
+        onChange({
+            ...getCurrentFilter(),
+            dateMonth: getPeriod(lastMonths, value || ""),
+        });
     };
 
     const onChangeLastMonths = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.checked;
-        const dashboardSelected = dashboards.find(d => d.id === dashboard);
-        const dashboardData: DashboardFilterData = {
-            dashboard: dashboardSelected,
-            dateMonth: getPeriod(value, month || ""),
-        };
         setLastMonths(value);
-        onChange(dashboardData);
+        onChange({
+            ...getCurrentFilter(),
+            dateMonth: getPeriod(value, month || ""),
+        });
+    };
+
+    const onChangeOrgUnit = (value: OrgUnitPath[]) => {
+        setOrgUnitPaths(value);
+        onChange({
+            ...getCurrentFilter(),
+            orgUnitPaths: value,
+        });
     };
 
     return (
@@ -121,6 +135,8 @@ export const DashboardFilter: React.FC<DashboardFilterProps> = React.memo(({ chi
                 control={<Checkbox name="last-four-months" checked={lastMonths} onChange={onChangeLastMonths} />}
                 label={i18n.t("Last four months")}
             />
+
+            <OrgUnitFilter selected={orgUnitPaths ?? []} onChange={onChangeOrgUnit} />
 
             {children}
         </Container>

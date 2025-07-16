@@ -7,7 +7,7 @@ import i18n from "../../utils/i18n";
 export function useSettings(template: TemplateReport | undefined) {
     const snackbar = useSnackbar();
     const loading = useLoading();
-    const { compositionRoot } = useAppContext();
+    const { compositionRoot, currentUser } = useAppContext();
 
     React.useEffect(() => {
         if (!template) {
@@ -18,9 +18,12 @@ export function useSettings(template: TemplateReport | undefined) {
     const saveSettings = React.useCallback(
         (settings: Settings) => {
             loading.show();
-            compositionRoot.settings.save.execute(settings).run(
+            compositionRoot.settings.save.execute({ settings, currentUser }).run(
                 () => {
                     loading.hide();
+                    snackbar.openSnackbar("success", i18n.t("Settings saved"), {
+                        autoHideDuration: 3000,
+                    });
                 },
                 err => {
                     snackbar.openSnackbar("error", err);
@@ -28,7 +31,7 @@ export function useSettings(template: TemplateReport | undefined) {
                 }
             );
         },
-        [loading, compositionRoot, snackbar]
+        [loading, compositionRoot, snackbar, currentUser]
     );
 
     return {

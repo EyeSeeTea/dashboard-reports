@@ -18,12 +18,28 @@ export const appConfig: AppConfig = {
             descriptionTemplate: "## Summary\n\n## Steps to reproduce\n\n## Actual results\n\n## Expected results\n\n",
         },
     },
+    header: false,
+    footer: false,
 };
 
-type AppConfig = {
+export interface HeaderOptions {
+    title: string;
+    background?: string;
+    color?: string;
+}
+export interface FooterOptions {
+    text: string;
+    background?: string;
+    color?: string;
+}
+
+export type AppConfig = {
     appKey: string;
     appearance: {
         showShareButton: boolean;
     };
     feedback?: FeedbackOptions;
-};
+    header: HeaderOptions | false;
+    footer: FooterOptions | false;
+}
+

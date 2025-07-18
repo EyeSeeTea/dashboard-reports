@@ -61,21 +61,21 @@ export function getImagesFromDom(dashboardItems: DashboardItem[]) {
             const $vizDomEl = document.querySelector(`#${dashboardItem.elementId}`);
 
             if (dashboardItem.reportType === "mapPlugin") {
-                const canvasEl = $vizDomEl?.querySelector("canvas") as HTMLCanvasElement;
+                const canvasEl = $vizDomEl?.querySelector("canvas") as HTMLCanvasElement | null;
                 if (canvasEl) {
                     newEl.base64 = canvasEl.toDataURL();
                     newEl.width = canvasEl.width;
                     newEl.height = canvasEl.height;
                 }
             } else if (dashboardItem.reportType === "chartPlugin" || dashboardItem.reportType === "eventChartPlugin") {
-                newEl.domEl = $vizDomEl?.querySelector("svg") as SVGElement;
+                newEl.domEl = $vizDomEl?.querySelector("svg") as SVGElement | null;
             } else if (
                 dashboardItem.reportType === "reportTablePlugin" ||
                 dashboardItem.reportType === "eventReportPlugin"
             ) {
-                newEl.domEl = $vizDomEl?.querySelector("table") as HTMLTableElement;
+                newEl.domEl = $vizDomEl?.querySelector("table") as HTMLTableElement | null;
                 const tableRects = newEl.domEl?.getClientRects();
-                if (tableRects[0]) {
+                if (tableRects && tableRects[0]) {
                     newEl.width = tableRects[0].width;
                     newEl.height = tableRects[0].height;
                 }

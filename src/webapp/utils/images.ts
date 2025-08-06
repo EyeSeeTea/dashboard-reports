@@ -77,7 +77,7 @@ export function getImagesFromDom(dashboardItems: DashboardItem[]) {
                 return newEl;
             }
             if (dashboardItem.type === "MAP") {
-                const canvasEl = root.querySelector("canvas") as HTMLCanvasElement;
+                const canvasEl = root.querySelector("canvas") as HTMLCanvasElement | null;
                 if (canvasEl) {
                     newEl.base64 = canvasEl.toDataURL();
                     newEl.width = canvasEl.width;
@@ -88,9 +88,9 @@ export function getImagesFromDom(dashboardItems: DashboardItem[]) {
                 dashboardItem.type === "EVENT_REPORT" ||
                 dashboardItem.visualization?.type === "PIVOT_TABLE"
             ) {
-                newEl.domEl = root.querySelector("table") as HTMLTableElement;
+                newEl.domEl = root.querySelector("table") as HTMLTableElement | null;
                 const tableRects = newEl.domEl?.getClientRects();
-                if (tableRects[0]) {
+                if (tableRects && tableRects[0]) {
                     newEl.width = tableRects[0].width;
                     newEl.height = tableRects[0].height;
                 }

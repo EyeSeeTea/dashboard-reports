@@ -86,9 +86,7 @@ export class Dashboard {
             // EVENT_CHART is not working with the new dhis-data-visualizer iframe
             dashboardItem.type === "EVENT_CHART" ||
             // EVENT_REPORT only works with the line-listing iframe
-            (dashboardItem.type === "EVENT_REPORT" && dashboardItem.eventVisualization?.type !== "LINE_LIST") ||
-            // VISUALIZATION type PIVOT_TABLE: dhis-data-visualizer iframe modifies dom on scroll. Prefer legacy for easy image export
-            (dashboardItem.type === "VISUALIZATION" && dashboardItem.visualization?.type === "PIVOT_TABLE")
+            (dashboardItem.type === "EVENT_REPORT" && dashboardItem.eventVisualization?.type !== "LINE_LIST")
         );
     }
 

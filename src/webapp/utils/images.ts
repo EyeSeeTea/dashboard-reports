@@ -1,13 +1,14 @@
 import html2canvas from "html2canvas";
 import { DashboardItem } from "../../domain/entities/Dashboard";
-import { Maybe } from "../../types/utils";
 
 export interface DocxItem {
     title: string;
     domEl: Element | null;
+    iframeEl: HTMLIFrameElement | null;
     base64: string;
     width: number;
     height: number;
+    isVirtualized?: boolean; // if the item is virtualized, we need to trigger rendering full contents before export
 }
 
 function convertSvgToPng(input: HTMLElement): Promise<HTMLCanvasElement> {
@@ -49,14 +50,13 @@ function getCanvasInformation(dashboardItem: DocxItem, canvas: HTMLCanvasElement
     };
 }
 
-function getVisualizationElement(dashboardItem: DashboardItem) {
+function getVisualizationElement(dashboardItem: DashboardItem): HTMLElement | HTMLIFrameElement | null {
     const itemElement = document.getElementById(dashboardItem.elementId);
     if (!itemElement) {
         return null;
     }
     if (itemElement.classList.contains("iframe-visualization")) {
-        return (itemElement.querySelector(`#${dashboardItem.elementId} iframe`) as Maybe<HTMLIFrameElement>)
-            ?.contentDocument;
+        return itemElement.querySelector<HTMLIFrameElement>(`#${dashboardItem.elementId} iframe`);
     }
     return itemElement;
 }
@@ -67,11 +67,15 @@ export function getImagesFromDom(dashboardItems: DashboardItem[]) {
             const newEl: DocxItem = {
                 title: dashboardItem.reportTitle,
                 domEl: null,
+                iframeEl: null,
                 base64: "",
                 width: 0,
                 height: 0,
+                isVirtualized: dashboardItem.visualization?.type === "PIVOT_TABLE",
             };
-            const root = getVisualizationElement(dashboardItem);
+            const element = getVisualizationElement(dashboardItem);
+            newEl.iframeEl = element?.tagName === "IFRAME" ? (element as HTMLIFrameElement) : null;
+            const root = element?.tagName === "IFRAME" ? (element as HTMLIFrameElement).contentDocument : element;
             if (!root) {
                 console.warn("No root element found for ", dashboardItem.elementId);
                 return newEl;
@@ -100,19 +104,105 @@ export function getImagesFromDom(dashboardItems: DashboardItem[]) {
             }
             return newEl;
         })
-        .map(dashboardItem => {
-            if (dashboardItem.domEl) {
-                if (dashboardItem.domEl.tagName === "svg") {
-                    return convertSvgToPng(dashboardItem.domEl as HTMLElement).then(canvas =>
-                        getCanvasInformation(dashboardItem, canvas)
+        .map(docxItem => {
+            if (docxItem.domEl) {
+                if (docxItem.domEl.tagName === "svg") {
+                    return convertSvgToPng(docxItem.domEl as HTMLElement).then(canvas =>
+                        getCanvasInformation(docxItem, canvas)
                     );
                 } else {
-                    return html2canvas(dashboardItem.domEl as HTMLElement).then(canvas =>
-                        getCanvasInformation(dashboardItem, canvas)
-                    );
+                    return withVirtualizationSupport(docxItem, async () => {
+                        return html2canvas(docxItem.domEl as HTMLElement).then(canvas =>
+                            getCanvasInformation(docxItem, canvas)
+                        );
+                    });
                 }
             } else {
-                return dashboardItem;
+                return docxItem;
             }
         });
+}
+
+/**
+ * workaround for virtualized items
+ * make containers large enough to trigger rendering of all contents,
+ * call the capture image function, and then restore the styles
+ */
+function withVirtualizationSupport(
+    docxItem: DocxItem,
+    captureCallback: (htmlElement: HTMLElement) => Promise<DocxItem>
+): Promise<DocxItem> {
+    if (!docxItem.isVirtualized || !docxItem.iframeEl) {
+        return captureCallback(docxItem.domEl as HTMLElement);
+    }
+    const prevStyles: { width: string | null; height: string | null } = {
+        height: null,
+        width: null,
+    };
+    function getContainers(iframe: HTMLIFrameElement) {
+        const appShellApp = iframe.contentDocument?.querySelector<HTMLDivElement>(".app-shell-app");
+        const appShellChild = appShellApp?.firstChild as HTMLElement | null;
+        const visualizationContainer = appShellChild?.querySelector(
+            '[data-test="visualization-container"]'
+        ) as HTMLElement | null;
+        return {
+            appShellChild,
+            visualizationContainer,
+        };
+    }
+    function getFullSize(visualizationContainer: HTMLElement) {
+        const visualizationBounding = (
+            visualizationContainer.firstChild as HTMLElement | null
+        )?.getBoundingClientRect();
+        return {
+            width: visualizationBounding?.width ? `${visualizationBounding?.width}px` : "10000px",
+            height: visualizationBounding?.height ? `${visualizationBounding?.height}px` : "10000px",
+        };
+    }
+    // changing the iframe styles directly makes html2canvas fail, change elements inside the document instead
+    const setStyles = (iframe: HTMLIFrameElement) => {
+        const { appShellChild, visualizationContainer } = getContainers(iframe);
+        if (!appShellChild || !visualizationContainer) {
+            console.warn("All containers couldn't be found for", docxItem.title);
+            return;
+        }
+        prevStyles.width = visualizationContainer.style.width;
+        prevStyles.height = appShellChild.style.height;
+        const { height: newHeight, width: newWidth } = getFullSize(visualizationContainer);
+        appShellChild.style.setProperty("height", newHeight);
+        visualizationContainer.style.setProperty("width", newWidth);
+    };
+    function restoreStyles(iframe: HTMLIFrameElement) {
+        const { appShellChild, visualizationContainer } = getContainers(iframe);
+        if (!appShellChild || !visualizationContainer) {
+            console.warn("All containers couldn't be found for", docxItem.title);
+            return;
+        }
+        appShellChild.style.setProperty("height", prevStyles.height);
+        visualizationContainer.style.setProperty("width", prevStyles.width);
+    }
+
+    if (!docxItem.iframeEl) {
+        console.warn("No iframe element found for", docxItem.title);
+        return Promise.resolve(docxItem);
+    }
+    setStyles(docxItem.iframeEl);
+    // wait for the styles to be applied and contents rendered - This will depend on the browser
+    // TODO: to improve reliability use an alternative approach such as MutationObserver
+    return wait(500)
+        .then(() => {
+            return captureCallback(docxItem.domEl as HTMLElement);
+        })
+        .finally(() => {
+            if (!docxItem.iframeEl) {
+                console.warn("No iframe element found for", docxItem.title);
+                return docxItem;
+            }
+            restoreStyles(docxItem.iframeEl);
+            return docxItem;
+        });
+}
+
+function wait(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }

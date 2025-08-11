@@ -41,5 +41,4 @@ export type AppConfig = {
     feedback?: FeedbackOptions;
     header: HeaderOptions | false;
     footer: FooterOptions | false;
-}
-
+};

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 // @ts-ignore
 import postRobot from "@krakenjs/post-robot";
-import { LinearProgress } from "material-ui";
 import { PluginVisualization } from "../../../domain/entities/PluginVisualization";
 import { useVisualizationIframeUrl } from "../../hooks/useDhis2Url";
 import { DashboardItem } from "../../../domain/entities/Dashboard";
@@ -15,13 +14,10 @@ export const VisualizationContents: React.FunctionComponent<VisualizationContent
     const { dashboardItem, visualization } = props;
     const iframeRef = React.useRef<HTMLIFrameElement>(null);
     const dataVisualizerPluginUrl = useVisualizationIframeUrl(visualization);
-    const isPluginReady = useVisualizationPlugin(iframeRef, visualization);
+    useVisualizationPlugin(iframeRef, visualization);
     return (
         <div style={styles.container} id={dashboardItem.elementId} className="iframe-visualization">
-            <>
-                {!isPluginReady && <LinearProgress />}
-                <iframe title="Visualization" src={dataVisualizerPluginUrl} ref={iframeRef} style={styles.iframe} />
-            </>
+            <iframe title="Visualization" src={dataVisualizerPluginUrl} ref={iframeRef} style={styles.iframe} />
         </div>
     );
 });
@@ -65,6 +61,7 @@ function useVisualizationPlugin(iframeRef: React.RefObject<HTMLIFrameElement>, v
             "installationStatus",
             { window: iframeRef.current.contentWindow },
             (ev: { data: { installationStatus: "READY" | "INSTALLING" | "UNKNOWN" } }) => {
+                // TODO: ev.data.installationStatus sometimes is null, is this a bug in the plugins?
                 if (ev.data.installationStatus === "READY") {
                     setPluginReady(true);
                 }

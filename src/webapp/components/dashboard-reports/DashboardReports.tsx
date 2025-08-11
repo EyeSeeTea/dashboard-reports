@@ -112,10 +112,11 @@ export const DashboardReports: React.FC = React.memo(() => {
                     {dashboardItems.map((dashboardItem, index) => {
                         return (
                             <VisualizationItem key={`${dashboardItem.reportId}-${index}`}>
-                                <Typography variant="subtitle1" component="p">
-                                    {dashboardItem.reportTitle}
-                                </Typography>
-
+                                <VisualizationTitle>
+                                    <Typography variant="subtitle1" component="h2">
+                                        {dashboardItem.reportTitle}
+                                    </Typography>
+                                </VisualizationTitle>
                                 <VisualizationFrame className="visualization">
                                     {dashboard && (
                                         <Visualization
@@ -152,13 +153,21 @@ const ContainerVisualizations = styled.div`
     }
 `;
 
+const VisualizationTitle = styled.div`
+    padding-inline: 10px;
+    padding-block: 5px;
+`;
 const VisualizationItem = styled.div`
     font-size: 16px;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
 `;
 
 const VisualizationFrame = styled.div`
     height: 400px;
     overflow: auto;
+    padding: 2px;
 `;
 
 const IconContainer = styled.div`

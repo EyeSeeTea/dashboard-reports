@@ -18,6 +18,7 @@ export const appConfig: AppConfig = {
             descriptionTemplate: "## Summary\n\n## Steps to reproduce\n\n## Actual results\n\n## Expected results\n\n",
         },
     },
+    publicPortalMode: false,
     header: false,
     footer: false,
 };
@@ -39,6 +40,7 @@ export type AppConfig = {
         showShareButton: boolean;
     };
     feedback?: FeedbackOptions;
+    publicPortalMode: boolean;
     header: HeaderOptions | false;
     footer: FooterOptions | false;
 };

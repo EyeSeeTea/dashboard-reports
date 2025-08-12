@@ -60,14 +60,14 @@ export const App: React.FC<AppProps> = React.memo(function App({ api, d2, instan
     }, [d2, api, instance]);
 
     if (loading) return null;
-
+    const showDhisHeader = !appConfig.publicPortalMode || appContext?.currentUser.isAdmin();
     return (
         <MuiThemeProvider theme={muiTheme}>
             <OldMuiThemeProvider muiTheme={muiThemeLegacy}>
                 <LoadingProvider>
                     <SnackbarProvider>
                         {appConfig.header && <CustomHeader {...appConfig.header} />}
-                        {appContext?.currentUser.isAdmin() ? <HeaderBar appName="Dashboard Reports" /> : null}
+                        {showDhisHeader ? <HeaderBar appName="Dashboard Reports" /> : null}
                         {appConfig.feedback && appContext && appContext.settings?.showFeedback && (
                             <Feedback options={appConfig.feedback} username={appContext.currentUser.username} />
                         )}

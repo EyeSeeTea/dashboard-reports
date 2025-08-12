@@ -196,3 +196,8 @@ Example config:
  }
 }
 ```
+
+### Public portal mode
+
+-   Configurable via `publicPortalMode` flag in `src/app-config.ts`
+-   When set to `true`, the DHIS2 header will be hidden for all users except admins

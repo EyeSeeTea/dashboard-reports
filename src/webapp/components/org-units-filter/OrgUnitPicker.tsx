@@ -14,13 +14,24 @@ export interface OrgUnitPickerProps {
 
 export const OrgUnitPicker: React.FC<OrgUnitPickerProps> = React.memo(props => {
     const { api, rootIds, selected, setSelected } = props;
-    const initiallyExpanded = React.useMemo(() => _.compact(selected.map(getOrgUnitParentPath)), [selected]);
+    const OU_SELECTOR_PATH_SEPARATOR = "/";
+    const initiallyExpanded = React.useMemo(
+        () =>
+            _(selected)
+                .compact()
+                .map(getOrgUnitParentPath)
+                .map(ouPath => ouPath.join(OU_SELECTOR_PATH_SEPARATOR))
+                .value(),
+        [selected]
+    );
 
     return (
         <OrgUnitsSelector
             api={api}
-            selected={selected}
-            onChange={setSelected}
+            selected={selected.map(ouPath => ouPath.join(OU_SELECTOR_PATH_SEPARATOR))}
+            onChange={(value: string[]) =>
+                setSelected(value.map(x => x.split(OU_SELECTOR_PATH_SEPARATOR) as OrgUnitPath))
+            }
             fullWidth={false}
             rootIds={rootIds}
             withElevation={false}
@@ -31,7 +42,6 @@ export const OrgUnitPicker: React.FC<OrgUnitPickerProps> = React.memo(props => {
                 filterByProgram: false,
                 selectAll: false,
             }}
-            onChildrenLoaded={{}}
         />
     );
 });

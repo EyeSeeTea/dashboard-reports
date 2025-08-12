@@ -6,12 +6,6 @@ import { OrgUnitRepository } from "../../domain/repositories/OrgUnitRepository";
 import { D2Api, MetadataPick } from "../../types/d2-api";
 import { apiToFuture } from "../../utils/futures";
 
-const orgUnitFields = { id: true, displayName: true, path: true, level: true } as const;
-
-type D2OrgUnit = MetadataPick<{
-    organisationUnits: { fields: typeof orgUnitFields };
-}>["organisationUnits"][number];
-
 export class OrgUnitD2Repository implements OrgUnitRepository {
     constructor(private api: D2Api) {}
 
@@ -40,9 +34,17 @@ export class OrgUnitD2Repository implements OrgUnitRepository {
     }
 
     private convertToOrgUnit(orgUnitResponse: D2OrgUnit): OrgUnit {
+        const DHIS_OU_PATH_SEPARATOR = "/";
         return {
             ..._.omit(orgUnitResponse, ["displayName"]),
             name: orgUnitResponse.displayName,
+            path: orgUnitResponse.path.split(DHIS_OU_PATH_SEPARATOR),
         };
     }
 }
+
+const orgUnitFields = { id: true, displayName: true, path: true, level: true } as const;
+
+type D2OrgUnit = MetadataPick<{
+    organisationUnits: { fields: typeof orgUnitFields };
+}>["organisationUnits"][number];

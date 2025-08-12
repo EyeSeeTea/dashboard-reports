@@ -9,19 +9,14 @@ export function useOrgUnitRoots() {
     const [orgUnitRootIds, setOrgUnitRootIds] = React.useState<Id[] | undefined>();
 
     React.useEffect(() => {
-        function fetchOrgUnitRoots() {
-            return compositionRoot.orgUnits.getRoots.execute().run(
-                orgUnitRoots => {
-                    setOrgUnitRootIds(orgUnitRoots.map(ou => ou.id));
-                },
-                err => {
-                    snackbar.openSnackbar("error", err);
-                }
-            );
-        }
-        const cancel = fetchOrgUnitRoots();
-
-        return () => cancel();
+        return compositionRoot.orgUnits.getRoots.execute().run(
+            orgUnitRoots => {
+                setOrgUnitRootIds(orgUnitRoots.map(ou => ou.id));
+            },
+            err => {
+                snackbar.openSnackbar("error", err);
+            }
+        );
     }, [compositionRoot, snackbar]);
 
     return {

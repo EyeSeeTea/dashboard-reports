@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { Id } from "./Ref";
 
-export type OrgUnitPath = string;
+export type OrgUnitPath = Id[];
 
 export interface OrgUnit {
     id: Id;
@@ -10,12 +10,10 @@ export interface OrgUnit {
     level: number;
 }
 
-const pathSeparator = "/";
-
 export function getIdFromPath(path: OrgUnitPath): Id {
-    return _.last(path.split(pathSeparator)) as Id;
+    return _.last(path) as Id;
 }
 
-export function getOrgUnitParentPath(path: OrgUnitPath) {
-    return _(path).split(pathSeparator).initial().join(pathSeparator);
+export function getOrgUnitParentPath(path: OrgUnitPath): OrgUnitPath {
+    return _.initial(path);
 }

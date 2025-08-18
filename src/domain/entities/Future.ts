@@ -100,6 +100,16 @@ export class Future<E, D> {
     static futureMap<T, E, D>(inputValues: T[], mapper: (value: T, index: number) => Future<E, D>): Future<E, D[]> {
         return this.parallel(inputValues.map((value, index) => mapper(value, index)));
     }
+
+    static fromPromise<Data>(res: Promise<Data>): Future<string, Data> {
+        return Future.fromComputation((resolve, reject) => {
+            res.then(resolve).catch(err => {
+                return reject(err.toString());
+            });
+
+            return () => {};
+        });
+    }
 }
 
 type JoinObj<Futures extends Record<string, Future<any, any>>> = Future<

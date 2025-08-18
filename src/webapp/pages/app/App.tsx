@@ -51,9 +51,10 @@ export const App: React.FC<AppProps> = React.memo(function App({ api, d2, instan
             const currentUser = (await compositionRoot.users.getCurrent.execute().runAsync()).data;
             const pluginVersion = `${_.get(d2, "system.version.major")}${_.get(d2, "system.version.minor")}`;
             const settings = await getSettingsOrInitialize(compositionRoot);
+            const apps = (await compositionRoot.apps.get.execute().runAsync()).data;
             if (!currentUser) throw new Error("User not logged in");
-
-            setAppContext({ api, currentUser, compositionRoot, isDev, settings, setAppContext, pluginVersion });
+            if (!apps) throw new Error("Cannot load apps");
+            setAppContext({ api, currentUser, compositionRoot, isDev, settings, setAppContext, pluginVersion, apps });
             setLoading(false);
         }
         setup();

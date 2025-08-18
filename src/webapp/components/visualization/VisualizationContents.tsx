@@ -4,6 +4,9 @@ import postRobot from "@krakenjs/post-robot";
 import { PluginVisualization } from "../../../domain/entities/PluginVisualization";
 import { useVisualizationIframeUrl } from "../../hooks/useDhis2Url";
 import { DashboardItem } from "../../../domain/entities/Dashboard";
+import { Plugin } from "@dhis2/app-runtime/build/es/experimental";
+import { useAppContext } from "../../contexts/app-context";
+import { shouldUseAppRuntimePlugin } from "../../../domain/entities/App";
 
 export interface VisualizationContentProps {
     dashboardItem: DashboardItem;
@@ -14,10 +17,16 @@ export const VisualizationContents: React.FunctionComponent<VisualizationContent
     const { dashboardItem, visualization } = props;
     const iframeRef = React.useRef<HTMLIFrameElement>(null);
     const dataVisualizerPluginUrl = useVisualizationIframeUrl(visualization);
-    useVisualizationPlugin(iframeRef, visualization);
+    const pluginProps = useVisualizationPluginProps(visualization);
+    useIframePlugin(iframeRef, pluginProps);
+    const shouldUseAppRuntime = useShouldUseAppRuntime(visualization);
     return (
         <div style={styles.container} id={dashboardItem.elementId} className="iframe-visualization">
-            <iframe title="Visualization" src={dataVisualizerPluginUrl} ref={iframeRef} style={styles.iframe} />
+            {shouldUseAppRuntime ? (
+                <Plugin pluginSource={dataVisualizerPluginUrl} width="100%" height="100%" {...pluginProps} />
+            ) : (
+                <iframe title="Visualization" src={dataVisualizerPluginUrl} ref={iframeRef} style={styles.iframe} />
+            )}
         </div>
     );
 });
@@ -32,16 +41,29 @@ const styles = {
     },
 };
 
-function useVisualizationPlugin(iframeRef: React.RefObject<HTMLIFrameElement>, visualization: object) {
-    React.useEffect(() => {
-        const iframe = iframeRef.current;
-        if (!iframe || !visualization) return;
-
-        const pluginProps = {
+function useVisualizationPluginProps(visualization: object) {
+    const props = React.useMemo(() => {
+        return {
             isVisualizationLoaded: false,
             displayProperty: "shortName",
             visualization: visualization,
         };
+    }, [visualization]);
+    return props;
+}
+
+function useShouldUseAppRuntime(visualization: PluginVisualization): boolean {
+    const { apps } = useAppContext();
+    const result = React.useMemo(() => {
+        return shouldUseAppRuntimePlugin(apps, visualization);
+    }, [apps, visualization]);
+    return result;
+}
+
+function useIframePlugin(iframeRef: React.RefObject<HTMLIFrameElement>, pluginProps: object) {
+    React.useEffect(() => {
+        const iframe = iframeRef.current;
+        if (!iframe || !pluginProps) return;
 
         postRobot
             .send(iframe.contentWindow, "newProps", pluginProps, { timeout: 15000 })
@@ -50,7 +72,7 @@ function useVisualizationPlugin(iframeRef: React.RefObject<HTMLIFrameElement>, v
         const listener = postRobot.on("getProps", { window: iframeRef.current.contentWindow }, () => pluginProps);
 
         return () => listener.cancel();
-    }, [iframeRef, visualization]);
+    }, [iframeRef, pluginProps]);
 
     const [isPluginReady, setPluginReady] = useState(false);
 

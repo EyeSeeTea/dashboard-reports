@@ -1,21 +1,21 @@
-import _ from "lodash";
 import { useAppContext } from "../contexts/app-context";
 import { PluginVisualization } from "../../domain/entities/PluginVisualization";
 import { LegacyReportType } from "../../domain/entities/Dashboard";
+import { findAppByVisualization } from "../../domain/entities/App";
+import React from "react";
 
 export function useDhis2Url(path = "") {
-    const { api, isDev } = useAppContext();
-    return (isDev ? "/dhis2" : api.baseUrl) + path;
+    const { api } = useAppContext();
+    return api.baseUrl + path;
 }
 
 export function useVisualizationIframeUrl(visualization: PluginVisualization) {
-    const VISUALIZATION_IFRAME_URLS = {
-        LINE_LIST: "/api/apps/line-listing/plugin.html",
-        MAP: "/dhis-web-maps/plugin.html",
-    };
-    const DEFAULT_VISUALIZATION_IFRAME_URL = "/dhis-web-data-visualizer/plugin.html";
-    const visualizationPath = _.get(VISUALIZATION_IFRAME_URLS, visualization.type, DEFAULT_VISUALIZATION_IFRAME_URL);
-    return useDhis2Url(visualizationPath);
+    const { apps } = useAppContext();
+    const url = React.useMemo(() => {
+        const app = findAppByVisualization(apps, visualization);
+        return app?.pluginLaunchUrl;
+    }, [apps, visualization]);
+    return useDhis2Url(url);
 }
 
 function getPluginName(reportType: LegacyReportType): string {

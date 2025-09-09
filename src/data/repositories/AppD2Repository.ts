@@ -9,11 +9,16 @@ export class AppD2Repository implements AppRepository {
 
     public get(): FutureData<App[]> {
         return Future.joinObj({
-            apps: apiToFuture(this.api.get<D2AppsResponse>("/apps")).map(response =>
+            installedApps: apiToFuture(this.api.get<D2AppsResponse>("/apps")).map(response =>
                 response.map(d2App => this.buildApp(d2App))
             ),
             bundledApps: this.fetchBundledApps().map(response => response.map(d2App => this.buildBundledApp(d2App))),
-        }).map(({ apps, bundledApps }) => [...bundledApps, ...apps]);
+        }).map(({ installedApps, bundledApps }) => {
+            const installedAppKeys = new Set(installedApps.map(app => app.key));
+            // exclude any bundled app that has been installed and returned from /apps, giving precedence to updated apps
+            const filteredBundledApps = bundledApps.filter(bundledApp => !installedAppKeys.has(bundledApp.key));
+            return [...filteredBundledApps, ...installedApps];
+        });
     }
 
     private fetchBundledApps(): FutureData<BundledD2App[]> {

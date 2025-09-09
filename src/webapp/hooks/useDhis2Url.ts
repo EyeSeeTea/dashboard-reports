@@ -4,9 +4,13 @@ import { LegacyReportType } from "../../domain/entities/Dashboard";
 import { findAppByVisualization } from "../../domain/entities/App";
 import React from "react";
 
-export function useDhis2Url(path = "") {
+export function useDhis2Url(url = "") {
     const { api } = useAppContext();
-    return api.baseUrl + path;
+    // if the url is absolute, return as is
+    if (/^https?:\/\//.test(url)) {
+        return url;
+    }
+    return api.baseUrl + url;
 }
 
 export function useVisualizationIframeUrl(visualization: PluginVisualization) {

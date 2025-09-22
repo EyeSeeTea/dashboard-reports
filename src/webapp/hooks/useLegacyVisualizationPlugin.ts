@@ -13,26 +13,33 @@ export function useLegacyVisualizationPlugin(dashboardItem: DashboardItem, visua
     const dhisUrl = useDhis2Url();
     const [state, setState] = React.useState<LoaderState<undefined>>({ type: "loading" });
     React.useEffect(() => {
-        loadJsPlugin(pluginFileName)
-            .then(() => {
-                const plugin = window[dashboardItem.legacyReportType];
-                if (!plugin) {
-                    throw new Error(
-                        i18n.t(`Legacy plugin "{{legacyReportType}}" not found`, {
-                            legacyReportType: dashboardItem.legacyReportType,
-                        })
-                    );
-                }
-                plugin.url = dhisUrl;
-                plugin.loadingIndicator = true;
-                plugin.dashboard = true;
-                plugin.load([{ ...visualization, el: dashboardItem.elementId }]);
-                setState({ type: "loaded", value: undefined });
-            })
-            .catch(err => {
-                snackbar.error(err.message);
-                setState({ type: "error", message: err.message });
-            });
+        async function loadPluginWithDependencies() {
+            // legacy js plugins require ExtJS
+            const DEPENDENCIES = ["/js/ext-all.js"];
+            try {
+                await Promise.all(DEPENDENCIES.map(dep => loadJsPlugin(dep)));
+                await loadJsPlugin(pluginFileName);
+            } catch (error) {
+                const message = error instanceof Error ? error.message : String(error);
+                snackbar.error(message);
+                setState({ type: "error", message: message });
+                return;
+            }
+            const plugin = window[dashboardItem.legacyReportType];
+            if (!plugin) {
+                throw new Error(
+                    i18n.t(`Legacy plugin "{{legacyReportType}}" not found`, {
+                        legacyReportType: dashboardItem.legacyReportType,
+                    })
+                );
+            }
+            plugin.url = dhisUrl;
+            plugin.loadingIndicator = true;
+            plugin.dashboard = true;
+            plugin.load([{ ...visualization, el: dashboardItem.elementId }]);
+            setState({ type: "loaded", value: undefined });
+        }
+        loadPluginWithDependencies();
     }, [dashboardItem, visualization, pluginFileName, snackbar, dhisUrl]);
     return state;
 }

@@ -52,6 +52,7 @@ const dashboardFields = {
         eventVisualization: {
             id: true,
             name: true,
+            type: true,
         },
         eventType: {
             id: true,

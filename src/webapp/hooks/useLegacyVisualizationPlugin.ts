@@ -14,6 +14,10 @@ export function useLegacyVisualizationPlugin(dashboardItem: DashboardItem, visua
     const [state, setState] = React.useState<LoaderState<undefined>>({ type: "loading" });
     React.useEffect(() => {
         async function loadPluginWithDependencies() {
+            if (!pluginFileName || !dashboardItem.legacyReportType) {
+                console.warn("Trying to load legacy plugin for non-legacy dashboard item", dashboardItem);
+                return;
+            }
             // legacy js plugins require ExtJS
             const DEPENDENCIES = ["/js/ext-all.js"];
             try {

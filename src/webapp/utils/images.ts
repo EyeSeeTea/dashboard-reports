@@ -1,5 +1,5 @@
 import html2canvas from "html2canvas";
-import { DashboardItem } from "../../domain/entities/Dashboard";
+import { DashboardItem, isLineListing } from "../../domain/entities/Dashboard";
 
 export interface DocxItem {
     title: string;
@@ -9,6 +9,7 @@ export interface DocxItem {
     width: number;
     height: number;
     isVirtualized?: boolean; // if the item is virtualized, we need to trigger rendering full contents before export
+    excludeElements?: HTMLElement[]; // elements inside the container to be hidden before export
 }
 
 function convertSvgToPng(input: HTMLElement): Promise<HTMLCanvasElement> {
@@ -90,6 +91,7 @@ export function getImagesFromDom(dashboardItems: DashboardItem[]) {
             } else if (
                 dashboardItem.type === "REPORT" ||
                 dashboardItem.type === "EVENT_REPORT" ||
+                isLineListing(dashboardItem) ||
                 dashboardItem.visualization?.type === "PIVOT_TABLE"
             ) {
                 newEl.domEl = root.querySelector("table") as HTMLTableElement | null;
@@ -97,6 +99,11 @@ export function getImagesFromDom(dashboardItems: DashboardItem[]) {
                 if (tableRects && tableRects[0]) {
                     newEl.width = tableRects[0].width;
                     newEl.height = tableRects[0].height;
+                }
+                if (isLineListing(dashboardItem)) {
+                    newEl.excludeElements = [newEl.domEl?.querySelector("tfoot") as HTMLElement].filter(
+                        Boolean
+                    ) as HTMLElement[];
                 }
             } else if (["CHART", "EVENT_CHART", "VISUALIZATION"].includes(dashboardItem.type)) {
                 const errorDiv = root.querySelector('[data-test="start-screen-error-container"]');
@@ -112,9 +119,7 @@ export function getImagesFromDom(dashboardItems: DashboardItem[]) {
                     );
                 } else {
                     return withVirtualizationSupport(docxItem, async () => {
-                        return html2canvas(docxItem.domEl as HTMLElement).then(canvas =>
-                            getCanvasInformation(docxItem, canvas)
-                        );
+                        return htmlToCanvas(docxItem).then(canvas => getCanvasInformation(docxItem, canvas));
                     });
                 }
             } else {
@@ -205,4 +210,19 @@ function withVirtualizationSupport(
 
 function wait(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function htmlToCanvas(docxItem: DocxItem): Promise<HTMLCanvasElement> {
+    if (docxItem.excludeElements) {
+        docxItem.excludeElements.forEach(el => {
+            el.style.setProperty("display", "none");
+        });
+    }
+    const canvas = await html2canvas(docxItem.domEl as HTMLElement);
+    if (docxItem.excludeElements) {
+        docxItem.excludeElements.forEach(el => {
+            el.style.removeProperty("display");
+        });
+    }
+    return canvas;
 }

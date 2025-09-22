@@ -1,12 +1,7 @@
 import _ from "lodash";
 import { Id } from "./Ref";
 
-export type LegacyReportType =
-    | "reportTablePlugin"
-    | "chartPlugin"
-    | "mapPlugin"
-    | "eventChartPlugin"
-    | "eventReportPlugin";
+export type LegacyReportType = "eventChartPlugin" | "eventReportPlugin";
 
 export interface DashboardData {
     id: Id;
@@ -19,7 +14,7 @@ export interface DashboardItem {
     type: string;
     reportId: string;
     useLegacy: boolean;
-    legacyReportType: LegacyReportType;
+    legacyReportType: LegacyReportType | null;
     reportTitle: string;
     elementId: string;
     map?: Map;
@@ -106,17 +101,16 @@ export class Dashboard {
         return this.getItemData(dashboardItem).id;
     }
 
-    private getItemLegacyReportType(dashboardItem: DashboardItem): LegacyReportType {
-        if (dashboardItem.map) {
-            return "mapPlugin";
-        } else if (dashboardItem.type === "EVENT_CHART") {
+    private getItemLegacyReportType(dashboardItem: DashboardItem): LegacyReportType | null {
+        if (dashboardItem.type === "EVENT_CHART") {
             return "eventChartPlugin";
         } else if (dashboardItem.type === "EVENT_REPORT") {
             return "eventReportPlugin";
-        } else if (dashboardItem.visualization && dashboardItem.visualization.type === "PIVOT_TABLE") {
-            return "reportTablePlugin";
-        } else {
-            return "chartPlugin";
         }
+        return null;
     }
+}
+
+export function isLineListing(dashboardItem: DashboardItem): boolean {
+    return dashboardItem.eventVisualization?.type === "LINE_LIST";
 }

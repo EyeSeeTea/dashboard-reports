@@ -44,8 +44,9 @@ const styles = {
 function useVisualizationPluginProps(visualization: object) {
     const props = React.useMemo(() => {
         return {
-            isVisualizationLoaded: false,
-            displayProperty: "shortName",
+            isVisualizationLoaded: true,
+            forDashboard: true,
+            displayProperty: "name",
             visualization: visualization,
         };
     }, [visualization]);

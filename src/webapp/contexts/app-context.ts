@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { CompositionRoot } from "../../CompositionRoot";
+import { App } from "../../domain/entities/App";
 import { Settings } from "../../domain/entities/Settings";
 import { User } from "../../domain/entities/User";
 import { D2Api } from "../../types/d2-api";
@@ -10,6 +11,8 @@ export interface AppContextState {
     compositionRoot: CompositionRoot;
     isDev: boolean;
     settings: Settings;
+    pluginVersion: string;
+    apps: App[];
     setAppContext: React.Dispatch<React.SetStateAction<AppContextState | null>>;
 }
 

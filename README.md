@@ -6,6 +6,10 @@ Install dependencies:
 $ yarn install
 ```
 
+## Version support
+
+DHIS2 versions 2.39 and above are supported
+
 ## Development
 
 Start the development server:
@@ -88,38 +92,41 @@ Check the example script, entry `"script-example"`in `package.json`->scripts and
 
 ### About Plugins
 
-Right now the application support 5 different plugins:
+There are two ways to include visualizations:
+
+-   Using iframes: Supported by newer features of the app platform
+-   Using JavaScript plugins (Legacy): Maintained for compatibility with eventCharts and eventReports
+
+The reference implementation for iframes can be found in the `VisualizationContents` component. In the future, the [App Runtime Plugin component](https://developers.dhis2.org/docs/app-runtime/components/plugin/) may replace this component.
+
+Legacy visualizations are implemented in the `LegacyVisualizationContents` component. This approach is retained for backwards compatibility and to support visualizations not yet compatible with the iframe plugin architecture.
+
+All visualizations will be rendered using the iframes plugin architecture. Only Event Charts and Event Reports use the legacy JS plugins.
+
+#### Legacy Plugins
+
+Right now the application support 2 different legacy plugins:
 
 | Report        | plugin filename |
 | ------------- | --------------- |
-| Pivot Tables  | reporttable.js  |
 | Event Charts  | eventchart.js   |
 | Event Reports | eventreport.js  |
-| Maps          | map.js          |
-| Charts        | chart.js        |
 
 You can see within the **public** folder the following folder structure:
 
 ```
-/236
-  reporttable.min.js
+/240
   eventchart.min.js
-  # all the other plugins
+  eventreport.min.js
 
-/237
-  reporttable.min.js
+/241
   eventchart.min.js
-  # all the other plugins
-
-/238
-  reporttable.min.js
-  eventchart.min.js
-  # all the other plugins
+  eventreport.min.js
 ```
 
-Plugins have different functionality depending on the DHIS2 version, so we first get the version and then load all the scripts from the specific folder.
+Plugins have different functionality depending on the DHIS2 version, so we first get the version and load the scripts from the corresponding folder.
 
-### Adding a new version
+#### Adding a new Legacy Plugin version
 
 If you want to add a new version the first thing to do is download the .war file from the [releases page](https://releases.dhis2.org/). Pick the version you want.
 
@@ -133,7 +140,7 @@ Now go into the new folder and find the plugins:
 
 ```bash
 $ cd war-239
-$ find | grep '\(eventreport\|reporttable\|chart\|map\)\.js$'
+$ find | grep '\(eventreport\|eventchart\)\.js$'
 ```
 
 Which returns the path to plugin scripts (not all the versions have the plugins in the same paths):
@@ -141,9 +148,6 @@ Which returns the path to plugin scripts (not all the versions have the plugins 
 ```
 ./dhis-web-event-visualizer/eventchart.js
 ./dhis-web-event-reports/eventreport.js
-./dhis-web-maps/map.js
-./dhis-web-interpretation/chart.js
-./dhis-web-interpretation/reporttable.js
 ```
 
 Inside **public**, create a new folder with the version (example: `239`) you want to add:
@@ -158,11 +162,8 @@ Now copy all files inside the folder. As a final step, please add the word ".min
 ```
 /public
   /239
-    reporttable.min.js
     eventchart.min.js
     eventreport.min.js
-    map.min.js
-    chart.min.js
 ```
 
 Now you can start the server and check if every visualization is working properly.
@@ -170,3 +171,33 @@ Now you can start the server and check if every visualization is working properl
 ### Storage
 
 Settings can be saved in the data store (default) or as constants. Use the env variable **REACT_APP_STORAGE** to select which one to use (`datastore` or `constants`).
+
+### Custom Header and Footer
+
+The header and footer can be configured in `src/app-config.ts`. They can be disabled by setting their values to `false`.
+See `HeaderOptions` and `FooterOptions` types for supported options.
+
+Example config:
+
+```typescript
+{
+ header: {
+     title: "Dashboard Reports - Custom Header Title",
+     background: "rgba(19,52,59,1)",
+     color: "white",
+ },
+ footer: {
+     text: `Dashboard Reports - Custom Footer.
+     Multi-line text is allowed.
+     TBD: More customization options.
+     `,
+     background: "linear-gradient(90deg, rgba(31,41,30,1) 0%, rgba(20,50,28,1) 50%, rgba(31,41,30,1) 100%)",
+     color: "white",
+ }
+}
+```
+
+### Public portal mode
+
+-   Configurable via `publicPortalMode` flag in `src/app-config.ts`
+-   When set to `true`, the DHIS2 header will be hidden for all users except admins

@@ -16,11 +16,17 @@ export class UserD2Repository implements UserRepository {
     }
 
     private buildUser(d2User: D2User) {
+        const username = d2User.userCredentials?.username || d2User.username;
+        const userRoles = d2User.userCredentials?.userRoles || d2User.userRoles;
+        if (!username || !userRoles) {
+            throw new Error("User data missing: username and userRoles are required");
+        }
         return new User({
             id: d2User.id,
             name: d2User.displayName,
             userGroups: d2User.userGroups,
-            ...d2User.userCredentials,
+            username: username,
+            userRoles: userRoles,
         });
     }
 }
@@ -33,6 +39,13 @@ const userFields = {
         username: true,
         userRoles: { id: true, name: true, authorities: true },
     },
+    // v42+ is not returning userCredentials in the /me endpoint
+    // but supports userRoles and username at root level
+    userRoles: { id: true, name: true, authorities: true },
+    username: true,
 } as const;
 
-type D2User = MetadataPick<{ users: { fields: typeof userFields } }>["users"][number];
+type D2User = MetadataPick<{ users: { fields: typeof userFields } }>["users"][number] & {
+    username?: string;
+    userRoles?: { id: string; name: string; authorities: string[] }[];
+};

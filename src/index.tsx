@@ -8,7 +8,6 @@ import { Instance } from "./data/entities/Instance";
 import { getD2APiFromInstance } from "./utils/d2-api";
 import { App } from "./webapp/pages/app/App";
 import { D2Api } from "./types/d2-api";
-import { loadPluginsByVersion } from "./utils/plugin";
 
 declare global {
     interface Window {
@@ -48,13 +47,18 @@ async function main() {
         if (isDev) window.api = api;
 
         const userSettings = await api.get<{ keyUiLocale: string }>("/userSettings").getData();
-        // Load plugins by version
-        const version = `${d2.system.version.major}${d2.system.version.minor}`;
-        await loadPluginsByVersion(version);
         configI18n(userSettings);
 
+        const providerProps: Omit<React.ComponentProps<typeof Provider>, "children"> = {
+            config: { baseUrl: baseUrl, apiVersion: 30 },
+            offlineInterface: null,
+            plugin: false,
+            parentAlertsAdd: null,
+            showAlertsInPlugin: false,
+        };
+
         ReactDOM.render(
-            <Provider config={{ baseUrl, apiVersion: 30 }}>
+            <Provider {...providerProps}>
                 <App api={api} d2={d2} instance={instance} />
             </Provider>,
             document.getElementById("root")

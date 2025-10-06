@@ -19,7 +19,7 @@ export function useLegacyVisualizationPlugin(dashboardItem: DashboardItem, visua
                 return;
             }
             // legacy js plugins require ExtJS
-            const DEPENDENCIES = ["/js/ext-all.min.js"];
+            const DEPENDENCIES = ["./js/ext-all.min.js"];
             try {
                 await Promise.all(DEPENDENCIES.map(dep => loadJsPlugin(dep)));
                 await loadJsPlugin(pluginFileName);

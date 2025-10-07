@@ -45,69 +45,9 @@ export class Dashboard {
         this.name = data.name;
 
         this.dashboardItems = _(data.dashboardItems)
-            .filter(dashboardItem => this.showInDashboard(dashboardItem))
-            .map(dashboardItem => {
-                return {
-                    ...this.getReportInformation(dashboardItem),
-                    elementId: dashboardItem.id,
-                    width: dashboardItem.width,
-                    height: dashboardItem.height,
-                };
-            })
             .uniqBy("reportId")
             .sortBy(dashboard => dashboard.reportTitle)
             .value();
-    }
-
-    private showInDashboard(dashboardItem: DashboardItem): boolean {
-        return Boolean(dashboardItem.visualization || dashboardItem.map || dashboardItem.eventVisualization);
-    }
-
-    private getReportInformation(dashboardItem: DashboardItem): DashboardItem {
-        return {
-            ...dashboardItem,
-            reportTitle: this.getItemTitle(dashboardItem),
-            reportId: this.getItemReportId(dashboardItem),
-            useLegacy: this.getItemShouldUseLegacy(dashboardItem),
-            legacyReportType: this.getItemLegacyReportType(dashboardItem),
-        };
-    }
-
-    /**
-     * @returns true when Legacy Plugin is preferred.
-     */
-    private getItemShouldUseLegacy(dashboardItem: DashboardItem): boolean {
-        return (
-            // EVENT_CHART is not working with the new dhis-data-visualizer iframe
-            dashboardItem.type === "EVENT_CHART" ||
-            // EVENT_REPORT only works with the line-listing iframe
-            (dashboardItem.type === "EVENT_REPORT" && dashboardItem.eventVisualization?.type !== "LINE_LIST")
-        );
-    }
-
-    private getItemData(dashboardItem: DashboardItem) {
-        const data = dashboardItem.map ?? dashboardItem.eventVisualization ?? dashboardItem.visualization;
-        if (!data) {
-            throw new Error("Missing property - one of: map, eventVisualization, visualization");
-        }
-        return data;
-    }
-
-    private getItemTitle(dashboardItem: DashboardItem): string {
-        return this.getItemData(dashboardItem).name.trim();
-    }
-
-    private getItemReportId(dashboardItem: DashboardItem): string {
-        return this.getItemData(dashboardItem).id;
-    }
-
-    private getItemLegacyReportType(dashboardItem: DashboardItem): LegacyReportType | null {
-        if (dashboardItem.type === "EVENT_CHART") {
-            return "eventChartPlugin";
-        } else if (dashboardItem.type === "EVENT_REPORT") {
-            return "eventReportPlugin";
-        }
-        return null;
     }
 }
 

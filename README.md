@@ -172,6 +172,8 @@ Now you can start the server and check if every visualization is working properl
 
 Settings can be saved in the data store (default) or as constants. Use the env variable **REACT_APP_STORAGE** to select which one to use (`datastore` or `constants`).
 
+Default settings are setup the first time the app is executed. See `public/default-settings.json`
+
 ### Custom Header and Footer
 
 The header and footer can be configured in `src/app-config.ts`. They can be disabled by setting their values to `false`.
@@ -204,11 +206,14 @@ Example config:
 
 ### Report templates
 
-Example report templates are provided as part of the default settings. Templates can be found in the `templates` directory.  
-Default settings are stored in `public/default-settings.json`, and templates are inlined there.  
-To modify any template or add a new one, the `"template"` property must be the raw file base64 encoded string.
+Example report templates are provided as part of the default settings. Default templates can be found in the `templates` directory for reference.
+
+To modify any template file or add a new one, you will need to update the settings `"template"` property with the raw file base64 encoded.
+
+Get this template string:
 
 ```bash
 cat templates/complex.docx | base64 -w 0
-# copy the result of this into the "template" property of the template you want to change in default-settings.json
 ```
+
+The resulting value can be copied into your settings (dataStore or constant).

@@ -201,3 +201,14 @@ Example config:
 
 -   Configurable via `publicPortalMode` flag in `src/app-config.ts`
 -   When set to `true`, the DHIS2 header will be hidden for all users except admins
+
+### Report templates
+
+Example report templates are provided as part of the default settings. Templates can be found in the `templates` directory.  
+Default settings are stored in `public/default-settings.json`, and templates are inlined there.  
+To modify any template or add a new one, the `"template"` property must be the raw file base64 encoded string.
+
+```bash
+cat templates/complex.docx | base64 -w 0
+# copy the result of this into the "template" property of the template you want to change in default-settings.json
+```

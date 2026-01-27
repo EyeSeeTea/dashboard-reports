@@ -172,6 +172,8 @@ Now you can start the server and check if every visualization is working properl
 
 Settings can be saved in the data store (default) or as constants. Use the env variable **REACT_APP_STORAGE** to select which one to use (`datastore` or `constants`).
 
+Default settings are setup the first time the app is executed. See `public/default-settings.json`
+
 ### Custom Header and Footer
 
 The header and footer can be configured in `src/app-config.ts`. They can be disabled by setting their values to `false`.
@@ -201,3 +203,17 @@ Example config:
 
 -   Configurable via `publicPortalMode` flag in `src/app-config.ts`
 -   When set to `true`, the DHIS2 header will be hidden for all users except admins
+
+### Report templates
+
+Example report templates are provided as part of the default settings. Default templates can be found in the `templates` directory for reference.
+
+To modify any template file or add a new one, you will need to update the settings `"template"` property with the raw file base64 encoded.
+
+Get this template string:
+
+```bash
+cat templates/complex.docx | base64 -w 0
+```
+
+The resulting value can be copied into your settings (dataStore or constant).

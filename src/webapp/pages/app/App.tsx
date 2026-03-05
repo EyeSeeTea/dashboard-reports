@@ -1,4 +1,3 @@
-import { HeaderBar } from "@dhis2/ui";
 import { SnackbarProvider, LoadingProvider } from "@eyeseetea/d2-ui-components";
 import { Feedback } from "@eyeseetea/feedback-component";
 import { MuiThemeProvider } from "@material-ui/core/styles";
@@ -19,6 +18,7 @@ import { muiTheme } from "./themes/dhis2.theme";
 import _ from "lodash";
 import { CustomHeader } from "../../components/custom-header/CustomHeader";
 import { CustomFooter } from "../../components/custom-footer/CustomFooter";
+import { HeaderBar } from "./header-bar/HeaderBar";
 
 export interface AppProps {
     api: D2Api;

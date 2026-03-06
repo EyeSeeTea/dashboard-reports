@@ -11,7 +11,7 @@ import React from "react";
  * only the path from the first "/dhis-web-" segment, so it works for any prefix.
  */
 function normalizePluginPathForLocalDev(path: string): string {
-    if (process.env.NODE_ENV !== "development") return path;
+    if (!import.meta.env.DEV) return path;
     const dhisWebIndex = path.indexOf("/dhis-web-");
     if (dhisWebIndex === -1) return path;
     const normalized = path.slice(dhisWebIndex);
@@ -22,7 +22,7 @@ export function useDhis2Url(url = "") {
     const { api } = useAppContext();
     // if the url is absolute, return as is
     if (/^https?:\/\//.test(url)) {
-        if (process.env.NODE_ENV === "development") {
+        if (import.meta.env.DEV) {
             // in dev server it can lead to cross-origin issues
             // need to go through baseUrl (proxied)
 

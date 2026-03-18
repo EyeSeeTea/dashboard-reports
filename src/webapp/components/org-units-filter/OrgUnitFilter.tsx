@@ -1,6 +1,7 @@
 import React from "react";
 import { IconButton, InputAdornment, TextField } from "@material-ui/core";
 import { Clear as ClearIcon } from "@material-ui/icons";
+import styled from "styled-components";
 import { OrgUnitPath } from "../../../domain/entities/OrgUnit";
 import { useAppContext } from "../../contexts/app-context";
 import { OrgUnitPicker } from "./OrgUnitPicker";
@@ -53,29 +54,40 @@ export const OrgUnitFilter: React.FC<OrgUnitFilterProps> = React.memo(props => {
                     setSelected={setSelectedChanges}
                 />
             </ConfirmationDialog>
-            <TextField
-                label={i18n.t("Select Organization Units")}
-                value={orgUnitsText}
-                disabled={orgUnitLoader.type === "loading"}
-                onClick={() => setOpen(true)}
-                InputProps={{
-                    readOnly: true,
-                    endAdornment: selected.length > 0 && (
-                        <InputAdornment position="end">
-                            <IconButton
-                                aria-label={i18n.t("Clear")}
-                                onClick={e => {
-                                    e.stopPropagation();
-                                    setSelectedChanges([]);
-                                    onChange([]);
-                                }}
-                            >
-                                <ClearIcon />
-                            </IconButton>
-                        </InputAdornment>
-                    ),
-                }}
-            />
+            <TextFieldWrapper>
+                <TextField
+                    label={i18n.t("Select Organization Units")}
+                    value={orgUnitsText}
+                    disabled={orgUnitLoader.type === "loading"}
+                    onClick={() => setOpen(true)}
+                    InputLabelProps={{
+                        style: { whiteSpace: "nowrap" },
+                    }}
+                    InputProps={{
+                        readOnly: true,
+                        endAdornment: selected.length > 0 && (
+                            <InputAdornment position="end">
+                                <IconButton
+                                    aria-label={i18n.t("Clear")}
+                                    onClick={e => {
+                                        e.stopPropagation();
+                                        setSelectedChanges([]);
+                                        onChange([]);
+                                    }}
+                                >
+                                    <ClearIcon />
+                                </IconButton>
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+            </TextFieldWrapper>
         </>
     );
 });
+
+const TextFieldWrapper = styled.div`
+    min-width: 240px;
+    width: 240px;
+    flex-shrink: 0;
+`;

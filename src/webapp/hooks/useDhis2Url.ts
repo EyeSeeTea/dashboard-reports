@@ -4,6 +4,20 @@ import { LegacyReportType } from "../../domain/entities/Dashboard";
 import { findAppByVisualization } from "../../domain/entities/App";
 import React from "react";
 
+/**
+ * In development, the server may return plugin URLs with a version or environment prefix
+ * (e.g. /stable-2-42-4/dhis-web-data-visualizer/plugin.html). Local instances typically
+ * serve DHIS2 web apps at /dhis-web-<app>/ without that prefix. We normalize by using
+ * only the path from the first "/dhis-web-" segment, so it works for any prefix.
+ */
+function normalizePluginPathForLocalDev(path: string): string {
+    if (process.env.NODE_ENV !== "development") return path;
+    const dhisWebIndex = path.indexOf("/dhis-web-");
+    if (dhisWebIndex === -1) return path;
+    const normalized = path.slice(dhisWebIndex);
+    return normalized;
+}
+
 export function useDhis2Url(url = "") {
     const { api } = useAppContext();
     // if the url is absolute, return as is
@@ -11,11 +25,14 @@ export function useDhis2Url(url = "") {
         if (process.env.NODE_ENV === "development") {
             // in dev server it can lead to cross-origin issues
             // need to go through baseUrl (proxied)
-            return api.baseUrl + new URL(url).pathname;
+
+            const path = normalizePluginPathForLocalDev(new URL(url).pathname);
+            return api.baseUrl + path;
         }
         return url;
     }
-    return api.baseUrl + url;
+    const path = normalizePluginPathForLocalDev(url);
+    return api.baseUrl + path;
 }
 
 export function useVisualizationIframeUrl(visualization: PluginVisualization) {

@@ -45,8 +45,8 @@ export const App: React.FC<AppProps> = React.memo(function App({ api, d2, instan
 
     useEffect(() => {
         async function setup() {
-            const isDev = process.env.NODE_ENV === "development";
-            const storageName = (process.env.REACT_APP_STORAGE as Maybe<StorageName>) || "datastore";
+            const isDev = import.meta.env.DEV;
+            const storageName = (import.meta.env.VITE_STORAGE as Maybe<StorageName>) || "datastore";
             const compositionRoot = getCompositionRoot(api, instance, storageName);
             const currentUser = (await compositionRoot.users.getCurrent.execute().runAsync()).data;
             const pluginVersion = `${_.get(d2, "system.version.major")}${_.get(d2, "system.version.minor")}`;

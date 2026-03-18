@@ -9,6 +9,10 @@
         "forceConsistentCasingInFileNames": true,
         "module": "esnext",
         "moduleResolution": "node",
+        "baseUrl": ".",
+        "paths": {
+            "@dhis2/app-runtime/experimental": ["./node_modules/@dhis2/app-runtime/build/types/experimental.d.ts"]
+        },
         "resolveJsonModule": true,
         "isolatedModules": true,
         "noEmit": true,
@@ -20,7 +24,9 @@
         "noUncheckedIndexedAccess": true,
         "experimentalDecorators": true,
         "noFallthroughCasesInSwitch": true,
-        "lib": ["dom", "dom.iterable", "esnext"]
+        "lib": ["dom", "dom.iterable", "esnext"],
+        "types": ["vite/client", "vitest/globals"]
     },
-    "include": ["src", "src/types/declaration.d.ts"]
+    "include": ["src", "src/types/declaration.d.ts"],
+    "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -4,7 +4,7 @@ import postRobot from "@krakenjs/post-robot";
 import { PluginVisualization } from "../../../domain/entities/PluginVisualization";
 import { useVisualizationIframeUrl } from "../../hooks/useDhis2Url";
 import { DashboardItem } from "../../../domain/entities/Dashboard";
-import { Plugin } from "@dhis2/app-runtime/build/es/experimental";
+import { Plugin } from "@dhis2/app-runtime/experimental";
 import { useAppContext } from "../../contexts/app-context";
 import { shouldUseAppRuntimePlugin } from "../../../domain/entities/App";
 

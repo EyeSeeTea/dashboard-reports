@@ -35,7 +35,11 @@ export function getTestContext() {
         d2: getTestD2(),
         currentUser: getTestUser(),
         config: getTestConfig(),
-        compositionRoot: getCompositionRoot(api, instance, process.env.REACT_APP_STORAGE as StorageName),
+        compositionRoot: getCompositionRoot(
+            api,
+            instance,
+            (import.meta.env.VITE_STORAGE as StorageName) || "datastore"
+        ),
     };
 
     return { api, context };

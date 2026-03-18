@@ -6,6 +6,50 @@ Install dependencies:
 $ yarn install
 ```
 
+This project uses **Yarn 4** managed by **Corepack** and declares:
+
+```json
+"packageManager": "yarn@4.12.0"
+```
+
+### If you have Yarn 1 globally and see a packageManager error
+
+If running `yarn` shows an error like:
+
+> This project's package.json defines "packageManager": "yarn@4.12.0". However the current global version of Yarn is 1.22.x.
+
+do the following once on your machine:
+
+```bash
+# 1) Remove global Yarn (optional but recommended)
+npm uninstall -g yarn
+
+# 2) Enable Corepack (shipped with Node 16.9+ / 14.19+)
+corepack enable
+
+# 3) Set Yarn 1.x as the default for projects WITHOUT packageManager
+corepack prepare yarn@1.22.22 --activate
+```
+
+Then, in this project (normal case, once Corepack is enabled):
+
+```bash
+yarn install
+```
+
+If for some reason `yarn --version` still shows `1.x` inside this repo (for example due to old Corepack state), you can force Yarn 4 explicitly:
+
+```bash
+corepack use yarn@4.12.0
+yarn --version # should now print 4.12.0
+yarn install
+```
+
+After this:
+
+- This repo will use **Yarn 4.12.0**.
+- Other repos without `packageManager` will keep using **Yarn 1.22.22** (or whatever you activated with `corepack prepare`).
+
 ## Version support
 
 DHIS2 versions 2.39 and above are supported
@@ -172,6 +216,8 @@ Now you can start the server and check if every visualization is working properl
 
 Settings can be saved in the data store (default) or as constants. Use the env variable **REACT_APP_STORAGE** to select which one to use (`datastore` or `constants`).
 
+Default settings are setup the first time the app is executed. See `public/default-settings.json`
+
 ### Custom Header and Footer
 
 The header and footer can be configured in `src/app-config.ts`. They can be disabled by setting their values to `false`.
@@ -201,3 +247,17 @@ Example config:
 
 -   Configurable via `publicPortalMode` flag in `src/app-config.ts`
 -   When set to `true`, the DHIS2 header will be hidden for all users except admins
+
+### Report templates
+
+Example report templates are provided as part of the default settings. Default templates can be found in the `templates` directory for reference.
+
+To modify any template file or add a new one, you will need to update the settings `"template"` property with the raw file base64 encoded.
+
+Get this template string:
+
+```bash
+cat templates/complex.docx | base64 -w 0
+```
+
+The resulting value can be copied into your settings (dataStore or constant).

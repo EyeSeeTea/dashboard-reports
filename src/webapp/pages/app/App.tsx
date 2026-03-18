@@ -1,4 +1,3 @@
-import { HeaderBar } from "@dhis2/ui";
 import { SnackbarProvider, LoadingProvider } from "@eyeseetea/d2-ui-components";
 import { Feedback } from "@eyeseetea/feedback-component";
 import { MuiThemeProvider } from "@material-ui/core/styles";
@@ -19,6 +18,7 @@ import { muiTheme } from "./themes/dhis2.theme";
 import _ from "lodash";
 import { CustomHeader } from "../../components/custom-header/CustomHeader";
 import { CustomFooter } from "../../components/custom-footer/CustomFooter";
+import { HeaderBar } from "./header-bar/HeaderBar";
 
 export interface AppProps {
     api: D2Api;
@@ -45,8 +45,8 @@ export const App: React.FC<AppProps> = React.memo(function App({ api, d2, instan
 
     useEffect(() => {
         async function setup() {
-            const isDev = process.env.NODE_ENV === "development";
-            const storageName = (process.env.REACT_APP_STORAGE as Maybe<StorageName>) || "datastore";
+            const isDev = import.meta.env.DEV;
+            const storageName = (import.meta.env.VITE_STORAGE as Maybe<StorageName>) || "datastore";
             const compositionRoot = getCompositionRoot(api, instance, storageName);
             const currentUser = (await compositionRoot.users.getCurrent.execute().runAsync()).data;
             const pluginVersion = `${_.get(d2, "system.version.major")}${_.get(d2, "system.version.minor")}`;

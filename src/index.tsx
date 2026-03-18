@@ -15,11 +15,11 @@ declare global {
     }
 }
 
-const isDev = process.env.NODE_ENV === "development";
+const isDev = import.meta.env.DEV;
 
 async function getBaseUrl() {
     if (isDev) {
-        return "/dhis2"; // See src/setupProxy.js
+        return "/dhis2"; // See vite.config.ts server.proxy
     } else {
         const manifest = await fetch("manifest.webapp").then(res => res.json());
         return manifest.activities.dhis.href;

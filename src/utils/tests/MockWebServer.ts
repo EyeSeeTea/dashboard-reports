@@ -55,7 +55,8 @@ export class MockWebServer {
             this.lastRequest = mappedRequest;
             this.allRequests?.push(mappedRequest);
 
-            const body = typeof handler.response === "function" ? (handler.response as any)(mappedRequest) : handler.response;
+            const body =
+                typeof handler.response === "function" ? (handler.response as any)(mappedRequest) : handler.response;
 
             return typeof body === "string"
                 ? new HttpResponse(body, { status: handler.httpStatusCode })

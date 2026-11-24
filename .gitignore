@@ -30,6 +30,7 @@ src/react-app.d.ts
 src/react-app-env.d.ts
 bak
 .eslintcache
+.journal/
 
 # cypress
 cypress/screenshots/
